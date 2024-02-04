@@ -34,12 +34,12 @@
 
         <div class="formTools">
           <div class="tools">Tools</div>
-          <div class="tool-item">
+          <!-- <div class="tool-item">
             <div>Functions</div>
             <div>
               <el-button class="tool-add" size="small" @click="funAdd" text>Add</el-button>
             </div>
-          </div>
+          </div> -->
           <div class="tool-item">
             <div>Code interpreter</div>
             <div>
@@ -99,8 +99,8 @@
         />
       </div>
       <div class="main-btn">
-        <el-button class="btn" @click="revert">Revert</el-button>
-        <el-button class="btn" type="primary" @click="save">Save</el-button>
+        <!-- <el-button class="btn" @click="revert">Revert</el-button> -->
+        <el-button class="btn" type="primary" :loading="saveLoading" @click="save">Save</el-button>
       </div>
     </div>
   </div>
@@ -273,12 +273,15 @@ const createEditFn = () => {
   }
   return obj
 }
+// 保存按钮loadig
+const saveLoading = ref<boolean>(false)
 // 创建
 const create = async () => {
   try {
     let obj = createEditFn()
 
     let res = await appApi.createAssistant(obj)
+    saveLoading.value = false
     ElMessage({
       message: 'Create Success',
       type: 'success'
@@ -308,6 +311,7 @@ const edit = async () => {
       message: 'Edit Success',
       type: 'success'
     })
+    saveLoading.value = false
     if (props.whoIsType === 'assistant') {
       emit('handleClose')
     } else {
@@ -327,6 +331,7 @@ const save = () => {
   if (!createForm.value) return
   createForm.value.validate(async (valid) => {
     if (!valid) return
+    saveLoading.value = true
     if (props.type === 'create') {
       create()
     } else {
@@ -459,12 +464,14 @@ defineExpose({
 
       // padding: 0 20px;
       .btn {
-        width: 46%;
+        width: 100%;
         height: 40px;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 14px;
+        background: linear-gradient(180deg, #4460dc, #6f89fe);
+        border: none;
       }
     }
     .mr-b {

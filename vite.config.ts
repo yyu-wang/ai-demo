@@ -8,7 +8,7 @@ export default defineConfig({
   server: {
     proxy: {
       '*': {
-        target: 'http://192.168.100.22:8000',
+        target: 'http://192.168.100.28:8000',
         changeOrigin: true
         // rewrite 不再需要，因为我们已经匹配了所有路径
       }

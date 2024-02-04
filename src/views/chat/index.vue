@@ -1,19 +1,16 @@
 <template>
   <div class="content">
-    <div class="create-form">
-      <div class="create-box" v-if="isShowCreateForm">
-        <CreateForm
-          ref="childRef"
-          :data="formData"
-          :type="createType"
-          :who-is-type="'chat'"
-          @handleGet="handleGet"
-        />
-      </div>
-      <div v-else class="form-btn-box">
-        <el-button type="primary" plain size="small" @click="isShowCreateForm = true"
-          >Create Assistant</el-button
+    <div class="table-list">
+      <div class="title">Assistants</div>
+      <div class="table-item-box">
+        <div
+          v-for="(item, index) in tableData"
+          :key="index"
+          :class="[assistantId == item.id ? 'table-item-b' : 'table-item-a', 'table-item']"
+          @click="slectAssistant(item)"
         >
+          {{ item.name }}
+        </div>
       </div>
     </div>
     <div class="playground">
@@ -30,13 +27,13 @@
             <div class="play-main" ref="chatRef" v-if="msgList.length">
               <div class="item-box" v-for="(item, index) in msgList" :key="index">
                 <div>
-                  <div class="user">User</div>
+                  <div class="type1">User</div>
                   <div class="item-content1">
                     {{ item.message }}
                   </div>
                 </div>
                 <div style="margin-top: 10px">
-                  <div class="user">GPT</div>
+                  <div class="type2">GPT</div>
 
                   <div class="item-content">
                     <div v-if="item.result"><MarkDownIt v-model="item.result" /></div>
@@ -55,6 +52,7 @@
                 :autosize="{ minRows: 4, maxRows: 10 }"
                 type="textarea"
                 placeholder="Enter your message..."
+                @keyup.enter="submit"
               />
               <div class="play-btn">
                 <!-- <el-upload
@@ -76,8 +74,8 @@
                   :disabled="isSubmit"
                   size="small"
                   :loading="isSubmit"
-                  ><el-icon><Top /></el-icon
-                ></el-button>
+                  ><el-icon size="16"><Promotion /></el-icon>
+                </el-button>
               </div>
             </div>
           </div>
@@ -85,11 +83,17 @@
       </div>
       <!-- 会话列表 -->
       <div class="playground-right">
-        <el-button type="primary" @click="beforeCreateSession" plain size="small"
-          >Create a new session</el-button
-        >
+        <div class="playground-right-btn">
+          <el-button type="primary" @click="beforeCreateSession">Create a new session</el-button>
+        </div>
+
         <div class="session-box">
-          <div class="session-item" v-for="item in sessionList" :key="item.id">
+          <div
+            class="session-item"
+            :class="[item.id === currentId ? 'session-item-1' : 'session-item-2']"
+            v-for="item in sessionList"
+            :key="item.id"
+          >
             <div class="session-text" @click.prevent="getMessageSession(item.id)">
               {{ item.name }}
             </div>
@@ -111,31 +115,20 @@
 
 <script setup lang="ts">
 import { onMounted, ref, nextTick } from 'vue'
-import CreateForm from '@/components/CreateFrom/index.vue'
 import MarkDownIt from '@/components/MarkDownIt/index.vue'
 import sessionApi from '@/api/session'
-import assistantApi from '@/api/assistant'
+
 import { ElMessage } from 'element-plus'
 import { chat_url } from '@/config/index'
-import { file_url } from '@/config/index'
-import type { UploadProps } from 'element-plus'
 import { useRoute } from 'vue-router'
 // import { EventSource } from './featEvent'
 import { setScrollTopFn } from './index'
 import { fetchEventSource } from '@microsoft/fetch-event-source'
 import { Base64 } from 'js-base64'
-
+import assistantApi from '@/api/assistant'
 const route = useRoute()
-const childRef = ref()
-const chatRef = ref()
 
-// 编辑表单类型
-const createType = ref('create')
-// 表单类型数据
-const formData = ref({})
-const headers = {
-  Authorization: 'Bearer ' + sessionStorage.getItem('token')
-}
+const chatRef = ref()
 
 interface msgItem {
   result: string
@@ -156,9 +149,6 @@ const isSubmit = ref<boolean>(false)
 const msgList = ref<msgItem[]>([])
 // 消息输入框
 const msg = ref()
-
-// 是否展示创建会话表单
-const isShowCreateForm = ref<boolean>(false)
 
 // 文件选择
 // 校验
@@ -194,9 +184,10 @@ const submit = () => {
         message: msg.value,
         result: ''
       }
+
       msgList.value.push(obj)
       console.log('msgList', msgList.value)
-
+      msg.value = ''
       // 按钮不可用及loading生效
       isSubmit.value = true
       // 设置滚动条位置
@@ -296,6 +287,7 @@ const deleteSession = async (id: string) => {
 // 获取会话聊天记录信息
 const getMessageSession = async (id: string) => {
   try {
+    msgList.value = []
     if (id) {
       let res = await sessionApi.messageList({ threadId: id, page: 1, pageSize: 1000 })
       msgList.value = res.data.list
@@ -308,27 +300,6 @@ const getMessageSession = async (id: string) => {
       setScrollTopFn(chatRef, nextTick)
       // console.log('chatRef', chatRef)
     }
-  } catch (error) {
-    console.log(error)
-  }
-}
-
-// 当前页面创建助手后返回当前助手id
-const handleGet = (id: any) => {
-  console.log('handleGet---chat', id)
-
-  if (id) {
-    assistantId.value = id
-    createType.value = 'edit'
-  }
-}
-
-// 根据id获取助手信息
-const getAssistantFn = async (id: string) => {
-  try {
-    let res = await assistantApi.getAssistant(id)
-    formData.value = { ...res.data }
-    createType.value = 'edit'
   } catch (error) {
     console.log(error)
   }
@@ -377,17 +348,40 @@ fetchEventSource(chat_url, {
   }
 })
 
+// 选择助手
+const slectAssistant = (e: any) => {
+  assistantId.value = Number(e.id)
+  msgList.value = []
+  getSessionList()
+}
+
+// 助手列表
+const tableData = ref()
+// 获取助手列表
+const getList = async () => {
+  try {
+    let res = await assistantApi.listAssistant({
+      page: 1,
+      pageSize: 100
+    })
+    tableData.value = res.data.list
+
+    // for (let index = 0; index < 20; index++) {
+    //   tableData.value.push({ id: 0 })
+    // }
+  } catch (error) {
+    console.log(error)
+  }
+}
 onMounted(() => {
   currentName.value = ''
   currentId.value = ''
   isSubmit.value = false
   msgList.value = []
-
   let { id } = route.query as any as { id: string }
+  getList()
   if (id) {
     assistantId.value = Number(id)
-    isShowCreateForm.value = true
-    getAssistantFn(id)
     getSessionList()
   } else {
     assistantId.value = undefined
@@ -401,23 +395,53 @@ onMounted(() => {
   flex-direction: row;
   height: 100%;
 
-  .create-form {
-    display: block;
+  .table-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     width: 400px;
     height: 100%;
-    border-right: 1px solid #d9d9e3;
-    position: relative;
 
-    .create-box {
-      height: 100%;
-      padding: 0 10px 0 0;
-    }
-    .form-btn-box {
-      width: 100%;
-      height: 100%;
+    .title {
+      height: 100px;
+      text-align: center;
       display: flex;
       align-items: center;
-      justify-content: center;
+      font-size: 30px;
+      font-weight: bold;
+    }
+    .table-item-box {
+      background: #ffffff;
+      width: 360px;
+      height: calc(100% - 150px);
+      border-radius: 10px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .table-item {
+        background: $bg-color;
+        width: 90%;
+        padding: 10px 0;
+        text-align: center;
+        margin-top: 10px;
+        font-size: 14px;
+        border-radius: 10px;
+        cursor: pointer;
+      }
+      .table-item-a {
+        background: $bg-color;
+        color: #000;
+      }
+      .table-item-b {
+        background: $basic-color;
+        color: #ffffff;
+      }
+      .table-item:hover {
+        background: $basic-color;
+        color: #ffffff;
+      }
     }
   }
   .playground {
@@ -435,7 +459,7 @@ onMounted(() => {
       .right-main {
         margin: 0 auto;
         width: 70%;
-        height: 100%;
+        height: calc(100% - 50px);
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -463,31 +487,40 @@ onMounted(() => {
             padding-bottom: 20px;
             width: 100%;
             flex-wrap: wrap;
-            height: 680px;
+            height: 720px;
             overflow-y: auto;
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 10px;
 
             .item-box {
               display: flex;
               flex-direction: column;
               margin: 0 10px;
 
-              .user {
-                font-size: 14px;
+              .type1 {
+                font-size: 16px;
                 font-weight: bold;
+                color: green;
+              }
+              .type2 {
+                font-size: 16px;
+                font-weight: bold;
+                color: $font-color;
               }
               .item-content1 {
-                font-size: 13px;
+                font-size: 14px;
                 color: #333333;
                 line-height: 30px;
-                background: #1a93bc17;
+                background: $bg-color;
                 border-radius: 6px;
                 padding: 0 10px;
                 margin-top: 10px;
               }
               .item-content {
-                font-size: 13px;
+                font-size: 14px;
                 color: #333333;
-                background: #1a93bc17;
+                background: $bg-color;
                 border-radius: 6px;
                 .chat-content-text {
                   font-size: 14px;
@@ -507,9 +540,10 @@ onMounted(() => {
             font-size: 30px;
           }
           .play-input-box {
-            width: 100%;
+            width: calc(100% + 20px);
             margin: 0 auto;
             position: relative;
+            // padding: 10px;
             .play-btn {
               width: 50px;
               position: absolute;
@@ -525,31 +559,36 @@ onMounted(() => {
     }
 
     .playground-right {
-      width: 300px;
-      height: calc(100% - 20px);
-      border-left: 1px solid #d9d9e3;
+      width: 400px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding-top: 20px;
+      padding: 0 20px;
+      .playground-right-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100px;
+      }
       .session-box {
-        width: 100%;
-        height: calc(100vh - 200px);
-        margin-top: 20px;
+        width: 360px;
+        height: calc(100vh - 150px);
         display: flex;
         align-items: center;
         flex-direction: column;
         overflow: auto;
+        background: #ffffff;
+        border-radius: 10px;
 
         .session-item {
-          width: 80%;
-          padding: 6px 20px;
+          width: calc(90% - 20px);
+          padding: 10px;
           display: flex;
           justify-content: space-between;
-          align-items: center;
           font-size: 15px;
-          color: #222222;
           cursor: pointer;
+          border-radius: 10px;
+          margin-top: 10px;
           .session-text {
             width: 200px;
             height: 20px;
@@ -558,11 +597,19 @@ onMounted(() => {
             text-overflow: ellipsis;
           }
         }
+        .session-item-1 {
+          background-color: $basic-color;
+          color: #ffffff;
+        }
+        .session-item-2 {
+          background: $bg-color;
+          color: #222222;
+        }
       }
 
       .session-item:hover {
-        background-color: #f2f2f2;
-        border-radius: 20px;
+        background-color: $basic-color;
+        color: #ffffff;
       }
     }
   }
@@ -570,7 +617,7 @@ onMounted(() => {
 
 /* 当视口宽度小于1200px时，隐藏左边的内容表单 */
 @media screen and (max-width: 1200px) {
-  .create-form {
+  .table-list {
     display: none !important;
   }
   .playground {

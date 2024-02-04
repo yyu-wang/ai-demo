@@ -1,14 +1,14 @@
 <template>
   <div id="layout">
-    <div class="left">
-      <!-- 菜单 -->
+    <!-- <div class="left">
+
       <Sider v-model="isCollapse"></Sider>
-      <!-- 退出登录 -->
+
       <div class="log-out" @click="logOut">
         <el-icon size="26" color="#999999"><UserFilled /></el-icon>
       </div>
-    </div>
-    <div class="right">
+    </div> -->
+    <!-- <div class="right">
       <div class="right-top">
         <RightTop v-model="isCollapse"></RightTop>
       </div>
@@ -17,35 +17,42 @@
           <router-view></router-view>
         </div>
       </div>
+    </div> -->
+    <div class="main-box">
+      <div class="main">
+        <router-view></router-view>
+      </div>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
-import Sider from './sider.vue'
-import RightTop from './rightTop.vue'
-import { useRouter } from 'vue-router'
-import { ElMessageBox } from 'element-plus'
-const router = useRouter()
+// import { ref } from 'vue'
+// import Sider from './sider.vue'
+// import RightTop from './rightTop.vue'
+// import { useRouter } from 'vue-router'
+// import { ElMessageBox } from 'element-plus'
+// const router = useRouter()
 
-const logOut = () => {
-  ElMessageBox.confirm('Log out?', 'Tip', {
-    confirmButtonText: 'Yes',
-    cancelButtonText: 'No',
-    type: 'warning'
-  }).then(() => {
-    sessionStorage.removeItem('token')
-    router.push({
-      path: '/login'
-    })
-  })
-}
+// const logOut = () => {
+//   ElMessageBox.confirm('Log out?', 'Tip', {
+//     confirmButtonText: 'Yes',
+//     cancelButtonText: 'No',
+//     type: 'warning'
+//   }).then(() => {
+//     sessionStorage.removeItem('token')
+//     router.push({
+//       path: '/login'
+//     })
+//   })
+// }
 
-const isCollapse = ref(false)
+// const isCollapse = ref(false)
 </script>
 <style scoped lang="scss">
 #layout {
   display: flex;
+  width: 100%;
+  height: 100vh;
 
   .left {
     min-height: 100vh;
@@ -77,19 +84,28 @@ const isCollapse = ref(false)
       display: flex;
       height: 40px;
     }
-    .main-box {
-      flex: 1;
-      background-color: #f2f2f5;
-      padding: 10px;
-      .main {
-        width: auto;
-        height: calc(100vh - 80px);
-        background-color: #ffffff;
-        border-radius: 6px;
-        box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
-        padding: 10px;
-        overflow: auto;
-      }
+    // .main-box {
+    //   flex: 1;
+    //   background-color: #f2f2f5;
+    //   padding: 10px;
+    //   .main {
+    //     width: auto;
+    //     height: calc(100vh - 80px);
+    //     background-color: #ffffff;
+    //     border-radius: 6px;
+    //     box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+    //     padding: 10px;
+    //     overflow: auto;
+    //   }
+    // }
+  }
+  .main-box {
+    flex: 1;
+    .main {
+      height: 100%;
+      border-radius: 6px;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+      overflow: auto;
     }
   }
 }

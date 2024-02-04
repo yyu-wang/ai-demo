@@ -1,8 +1,10 @@
 <template>
   <!-- 弹窗 -->
-  <el-drawer
-    v-model="drawer"
-    direction="ltr"
+
+  <el-dialog
+    v-model="isDialog"
+    :title="createType"
+    width="500"
     :before-close="handleClose"
     :close-on-click-modal="false"
   >
@@ -13,19 +15,19 @@
       :who-is-type="'assistant'"
       @handleClose="handleCloseCreateForm"
     />
-  </el-drawer>
+  </el-dialog>
   <!-- 内容 -->
   <div>
     <div class="top" v-if="tableData.length">
       <div class="top-title"></div>
       <div class="top-right">
         <div class="top-btn">
-          <el-button type="primary" @click="createFn">create</el-button>
+          <el-button class="btn" type="primary" @click="createFn">create</el-button>
         </div>
       </div>
     </div>
     <!-- 应用列表 -->
-    <div v-show="tableData.length">
+    <div v-show="tableData.length" class="tableData-box">
       <el-table :data="tableData" border style="width: 100%">
         <el-table-column align="center" prop="name" label="Name" width="180" />
         <el-table-column align="center" prop="instructions" label="Instructions" />
@@ -37,7 +39,7 @@
           <template #default="scope">
             <div style="display: flex; justify-content: space-between">
               <el-tooltip effect="dark" content="Delete" placement="top-start">
-                <el-popconfirm title="Delete assistant?" @confirm="deleteFn(scope.row)">
+                <el-popconfirm title="Delete Assistant?" @confirm="deleteFn(scope.row)">
                   <template #reference>
                     <el-icon><Delete /></el-icon>
                   </template>
@@ -55,8 +57,13 @@
       </el-table>
     </div>
     <div class="create-box" v-show="!tableData.length">
-      <div style="margin-bottom: 20px">Create an assistant</div>
-      <el-button type="primary" size="small" @click="createFn">Create</el-button>
+      <div class="create-item" @click="createFn">
+        <el-icon size="50" color="#1b9f0a"><OfficeBuilding /></el-icon>
+        <div class="item-text">
+          <span>Assistant</span>
+          <span class="sp">Create an assistant</span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -73,7 +80,7 @@ const userStore = useSystemStore()
 const router = useRouter()
 
 // import { toggleDark } from '@/composables'
-const drawer = ref(false)
+const isDialog = ref(false)
 const childRef = ref()
 
 const handleClose = (done: () => void) => {
@@ -91,7 +98,7 @@ const chatEditFromId = ref(null)
 const createFn = async () => {
   formData.value = {}
   createType.value = 'create'
-  drawer.value = true
+  isDialog.value = true
   await nextTick()
 }
 // 删除
@@ -112,7 +119,7 @@ const formData = ref({})
 const editFn = (row: any) => {
   formData.value = { ...row }
   createType.value = 'edit'
-  drawer.value = true
+  isDialog.value = true
 }
 
 // 进入测试页面
@@ -136,6 +143,10 @@ const getList = async () => {
       pageSize: 100
     })
     tableData.value = res.data.list
+    // for (let index = 0; index < 20; index++) {
+    //   tableData.value.push({ id: 0 })
+    // }
+
     // 聊天模块显示并且聊天模块有传回编辑id的时候将列表更新的数据重新赋值到传入聊天模块中
     if (chatEditFromId.value) {
       tableData.value.forEach((item: any) => {
@@ -150,7 +161,7 @@ const getList = async () => {
 }
 // 创建编辑表单后关闭
 const handleCloseCreateForm = () => {
-  drawer.value = false
+  isDialog.value = false
   getList()
 }
 
@@ -162,7 +173,7 @@ onMounted(() => {
 .top {
   width: 100%;
   height: 70px;
-  border-bottom: 2px solid #f2f2f2;
+  // border-bottom: 2px solid #f2f2f2;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -179,6 +190,24 @@ onMounted(() => {
   }
   .top-btn {
     margin-right: 50px;
+    .btn {
+      background: linear-gradient(180deg, #4460dc, #6f89fe);
+      border: none;
+    }
+  }
+}
+.tableData-box {
+  width: 90%;
+  height: 89vh;
+  overflow: auto;
+  margin: 0 auto;
+  border-radius: 10px;
+  // padding: 10px;
+  :deep(.el-table th.el-table__cell) {
+    background-color: #fafafa !important;
+  }
+  :deep(.el-table tr) {
+    background-color: #fafafa !important;
   }
 }
 .create-box {
@@ -188,6 +217,28 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  .create-item {
+    width: 300px;
+    height: 270px;
+    background-color: #ffffff80;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 0 0 0;
+    .item-text {
+      margin-top: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 20px;
+      font-weight: bold;
+      .sp {
+        font-size: 16px;
+        font-weight: 500;
+        margin-top: 20px;
+      }
+    }
+  }
 }
 </style>
-@/api/assistant
