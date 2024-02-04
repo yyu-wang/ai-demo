@@ -4,7 +4,7 @@ class sessionApi {
   // 创建会话
   createSession(data: any) {
     return request({
-      url: '/api/v1/conversation/create',
+      url: '/api/v1/chat/thread/create',
       data,
       method: 'POST'
     })
@@ -12,7 +12,7 @@ class sessionApi {
   // 会话列表
   listSession(data: any) {
     return request({
-      url: '/api/v1/conversation/list',
+      url: '/api/v1/chat/thread/list',
       params: data,
       method: 'GET'
     })
@@ -20,15 +20,15 @@ class sessionApi {
   // 删除会话
   deleteSession(data: any) {
     return request({
-      url: '/api/v1/conversation/delete',
+      url: '/api/v1/chat/thread/delete',
       data,
       method: 'POST'
     })
   }
   // 当前会话的聊天记录
-  messageSession(data: any) {
+  messageList(data: any) {
     return request({
-      url: '/api/v1/message/history',
+      url: '/api/v1/chat/thread/message/list',
       params: data,
       method: 'GET'
     })
@@ -36,7 +36,7 @@ class sessionApi {
   // 发送会话
   sendSession(data: any) {
     return request({
-      url: '/api/v1/send',
+      url: '/api/v1/chat/thread/message',
       data,
       method: 'POST'
     })

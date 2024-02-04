@@ -11,7 +11,7 @@ export interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
 // 创建 Axios 实例
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL as string, // 替换成你的 API 地址
-  timeout: 10000 // 请求超时时间
+  timeout: 30000 // 请求超时时间
 })
 
 // 请求拦截器

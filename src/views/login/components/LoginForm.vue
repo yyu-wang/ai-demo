@@ -1,7 +1,12 @@
 <template>
   <el-form ref="loginFormRef" :model="loginForm" :rules="loginRules" size="large">
     <el-form-item prop="userName">
-      <el-input v-model="loginForm.userName" placeholder="userName"> </el-input>
+      <el-input
+        v-model="loginForm.userName"
+        placeholder="userName"
+        @keyup.enter="login(loginFormRef)"
+      >
+      </el-input>
     </el-form-item>
     <el-form-item prop="password">
       <el-input
@@ -10,6 +15,7 @@
         placeholder="password"
         show-password
         autocomplete="new-password"
+        @keyup.enter="login(loginFormRef)"
       >
       </el-input>
     </el-form-item>
@@ -20,6 +26,7 @@
         placeholder="Enter password again"
         show-password
         autocomplete="new-password"
+        @keyup.enter="login(loginFormRef)"
       >
       </el-input>
     </el-form-item>
@@ -116,7 +123,7 @@ const submitLogin = async () => {
       })
       ElNotification({
         title: getTimeState(),
-        message: '欢迎登录',
+        message: 'Welcome',
         type: 'success',
         duration: 3000
       })
@@ -132,7 +139,7 @@ const submitLogin = async () => {
 const submitRegister = async (formEl: FormInstance | undefined) => {
   await loginApi.register(loginForm)
   ElMessage({
-    message: '注册成功',
+    message: 'Register successful',
     type: 'success'
   })
   resetForm(formEl)

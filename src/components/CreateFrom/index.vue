@@ -12,9 +12,9 @@
         <el-form-item label="Name" prop="name">
           <el-input v-model="formData.name" placeholder="Enter a user friendly name" />
         </el-form-item>
-        <el-form-item label="introductions" prop="introductions">
+        <el-form-item label="Instructions" prop="instructions">
           <el-input
-            v-model="formData.introductions"
+            v-model="formData.instructions"
             type="textarea"
             :autosize="{ minRows: 2, maxRows: 10 }"
             placeholder="You are a helpful assistant"
@@ -24,10 +24,10 @@
         <el-form-item label="Model" prop="model">
           <el-select v-model="formData.model" placeholder="Select">
             <el-option
-              v-for="item in modelList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
+              v-for="(item, index) in modelList"
+              :key="index"
+              :label="item"
+              :value="item"
             />
           </el-select>
         </el-form-item>
@@ -43,22 +43,16 @@
           <div class="tool-item">
             <div>Code interpreter</div>
             <div>
-              <el-switch
-                v-model="formData.codeInterpreter"
-                :active-value="1"
-                :inactive-value="0"
-                style="--el-switch-on-color: #10a37f"
-              />
+              <el-switch v-model="formData.codeInterpreter" style="--el-switch-on-color: #1a94bc" />
             </div>
           </div>
           <div class="tool-item">
             <div>Retrieval</div>
             <div>
               <el-switch
+                :disabled="isSwitchDisabled"
                 v-model="formData.retrieval"
-                :active-value="1"
-                :inactive-value="0"
-                style="--el-switch-on-color: #10a37f"
+                style="--el-switch-on-color: #1a94bc"
               />
             </div>
           </div>
@@ -85,7 +79,7 @@
               <div class="file">
                 {{ item.fileName }}
               </div>
-              <el-icon @click="delFile(index)">
+              <el-icon @click="delFile(index, item.id)">
                 <Delete />
               </el-icon>
             </div>
@@ -105,19 +99,19 @@
         />
       </div>
       <div class="main-btn">
-        <el-button class="btn" @click="revert">重置</el-button>
-        <el-button class="btn" type="primary" @click="save">保存</el-button>
+        <el-button class="btn" @click="revert">Revert</el-button>
+        <el-button class="btn" type="primary" @click="save">Save</el-button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watchEffect, toRefs, reactive, defineEmits, nextTick } from 'vue'
+import { ref, watchEffect, watch, toRefs, reactive, defineEmits, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { UploadProps, ElForm } from 'element-plus'
 import { file_url } from '@/config/index'
-import appApi from '@/api/app'
+import appApi from '@/api/assistant'
 const headers = {
   Authorization: 'Bearer ' + sessionStorage.getItem('token')
 }
@@ -130,20 +124,25 @@ const emit = defineEmits()
 const props = defineProps({
   data: {
     type: Object,
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     default: () => {}
   },
   type: {
     type: String,
     default: 'create'
+  },
+  whoIsType: {
+    type: String,
+    default: 'assistant'
   }
 })
 interface formDataType {
   name?: string
-  introductions?: string
-  model?: number
+  instructions?: string
+  model?: string
   functions?: string
-  codeInterpreter?: number
-  retrieval?: number
+  codeInterpreter?: boolean
+  retrieval?: boolean
 }
 
 // 表单信息
@@ -158,28 +157,45 @@ const revert = async () => {
   createForm.value.resetFields()
   formData.value = {
     name: '',
-    introductions: '',
-    model: undefined,
+    instructions: '',
+    model: '',
     functions: '',
-    codeInterpreter: 0,
-    retrieval: 0
+    codeInterpreter: false,
+    retrieval: false
   }
   fileList.value = []
 }
 
-// 编辑数据处理
+// 编辑前数据回显处理
 const editDataFn = (data: any) => {
-  let { name, introductions, model, tools } = data
+  let { name, instructions, model, tools, files } = data
+  let codeInterpreter = false
+  let retrieval = false
+  // 获取到的数据与展示所需要的数据类型不一致处理
+  if (tools.length) {
+    tools.forEach((item: any) => {
+      if (item.type == 'code_interpreter') {
+        codeInterpreter = true
+      }
+      if (item.type == 'retrieval') {
+        retrieval = true
+      }
+    })
+  } else {
+    codeInterpreter = false
+    retrieval = false
+  }
 
   formData.value = {
     name,
-    introductions,
+    instructions,
     model,
     functions: tools.functions,
-    codeInterpreter: tools.code_interpreter,
-    retrieval: tools.retrieval
+    codeInterpreter,
+    retrieval
   }
-  fileList.value = tools.files ? tools.files : []
+
+  fileList.value = files
 }
 watchEffect(() => {
   // 使用 toRefs 转换为 ref 对象
@@ -193,49 +209,32 @@ watchEffect(() => {
 })
 
 const fromRules = reactive({
-  name: [{ required: true, message: '请输入', trigger: 'blur' }],
-  introductions: [{ required: true, message: '请输', trigger: 'blur' }],
-  model: [{ required: true, message: '请输', trigger: 'change' }]
+  name: [{ required: true, message: 'please enter', trigger: 'blur' }],
+  instructions: [{ required: true, message: 'please enter', trigger: 'blur' }],
+  model: [{ required: true, message: 'please select', trigger: 'change' }]
 })
-// const isSave = ref(false)
+const isSwitchDisabled = ref(false)
 
-// watch(
-//   () => ({
-//     name: formData.value.name,
-//     introductions: formData.value.introductions,
-//     model: formData.value.model
-//   }),
-//   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-//   (newValue, oldValue) => {
-//     if (newValue.name && newValue.introductions && newValue.model) {
-//       isSave.value = true
-//     } else {
-//       isSave.value = false
-//     }
-//   }
-// )
+watch(
+  () => ({
+    model: formData.value.model
+  }),
+
+  (newValue) => {
+    if (newValue.model != 'gpt-3.5-turbo-1106') {
+      isSwitchDisabled.value = true
+    } else {
+      isSwitchDisabled.value = false
+    }
+  }
+)
 
 const modelList = ref([
-  {
-    label: 'gpt-3.5-turbo-16k-0613',
-    value: 1
-  },
-  {
-    label: 'gpt-3.5-turbo-16k',
-    value: 2
-  },
-  {
-    label: 'gpt-3.5-turbo-1106',
-    value: 3
-  },
-  {
-    label: 'gpt-3.5-turbo-0613',
-    value: 4
-  },
-  {
-    label: 'gpt-3.5-turbo',
-    value: 5
-  }
+  'gpt-3.5-turbo-16k-0613',
+  'gpt-3.5-turbo-16k',
+  'gpt-3.5-turbo-1106',
+  'gpt-3.5-turbo-0613',
+  'gpt-3.5-turbo'
 ])
 
 // 函数选择
@@ -243,58 +242,82 @@ const isFunction = ref(false)
 const funAdd = () => {
   isFunction.value = !isFunction.value
 }
+// 创建编辑保存前数据处理
+const createEditFn = () => {
+  let { name, instructions, model, functions, codeInterpreter, retrieval } = formData.value
+
+  let tools = []
+
+  if (functions) {
+    //json
+    tools.push({ type: 'function', function: functions })
+  }
+  if (retrieval) {
+    tools.push({ type: 'retrieval' })
+  }
+  if (codeInterpreter) {
+    tools.push({ type: 'code_interpreter' })
+  }
+  let fileIds: any[string] = []
+  fileList.value.forEach((item) => {
+    fileIds.push((item as any).fileId)
+  })
+  console.log('fileIds', fileIds)
+
+  let obj = {
+    name,
+    instructions,
+    model,
+    tools,
+    fileIds: fileIds ? fileIds : []
+  }
+  return obj
+}
 // 创建
 const create = async () => {
   try {
-    let { name, introductions, model, functions, codeInterpreter, retrieval } = formData.value
-    let tools = {
-      functions,
-      code_interpreter: codeInterpreter,
-      retrieval,
-      files: fileList.value
-    }
+    let obj = createEditFn()
 
-    let obj = {
-      name,
-      introductions,
-      model,
-      tools
-    }
-    await appApi.createApp(obj)
+    let res = await appApi.createAssistant(obj)
     ElMessage({
-      message: '创建成功!',
+      message: 'Create Success',
       type: 'success'
     })
-    emit('handleClose')
+    if (props.whoIsType === 'assistant') {
+      emit('handleClose')
+    }
+    if (props.whoIsType === 'chat') {
+      let { id } = res.data
+      emit('handleGet', id)
+    }
   } catch (error) {
+    ElMessage({
+      message: 'Error',
+      type: 'error'
+    })
     console.log(error)
   }
 }
 // 编辑
 const edit = async () => {
   try {
-    let { name, introductions, model, functions, codeInterpreter, retrieval } = formData.value
-    let tools = {
-      functions,
-      code_interpreter: codeInterpreter,
-      retrieval,
-      files: fileList.value
-    }
-    let id = props.data.id
-    let obj = {
-      id,
-      name,
-      introductions,
-      model,
-      tools
-    }
-    await appApi.editApp(obj)
+    let obj = createEditFn()
+    let { id, assistantAppId } = props.data
+    await appApi.editAssistant({ ...obj, id, assistantAppId })
     ElMessage({
-      message: '编辑成功!',
+      message: 'Edit Success',
       type: 'success'
     })
-    emit('handleClose')
+    if (props.whoIsType === 'assistant') {
+      emit('handleClose')
+    } else {
+      emit('handleGet', id)
+    }
   } catch (error) {
+    ElMessage({
+      message: 'Error',
+      type: 'error'
+    })
     console.log(error)
   }
 }
@@ -317,8 +340,23 @@ interface fileType {
 }
 
 //删除选中的文件
-const delFile = (e: any) => {
-  fileList.value.splice(e, 1)
+const delFile = async (e: any, id: any) => {
+  try {
+    if (id) {
+      await appApi.deleteAssistantFile({ id })
+      fileList.value.splice(e, 1)
+      ElMessage({
+        message: 'success',
+        type: 'success'
+      })
+    }
+  } catch (error) {
+    ElMessage({
+      message: 'Error',
+      type: 'error'
+    })
+    console.log('delFile-error', error)
+  }
 }
 // 校验
 const handleExceed: UploadProps['onExceed'] = (files, uploadFiles) => {
@@ -328,9 +366,11 @@ const handleExceed: UploadProps['onExceed'] = (files, uploadFiles) => {
     } totally`
   )
 }
-// 上次成功
+// 上传成功
 const handleSuccess: UploadProps['onSuccess'] = (response: any) => {
-  let res = response.data[0]
+  console.log('response', response)
+
+  let res = response.data
   fileList.value.push(res)
   console.log('fileList.value', fileList.value)
 }
@@ -379,7 +419,7 @@ defineExpose({
         border-bottom: 1px solid #ececf1;
         font-size: 15px;
         .tool-add {
-          color: #10a37f;
+          color: $basic-color;
           font-weight: bold;
         }
       }
@@ -433,3 +473,4 @@ defineExpose({
   }
 }
 </style>
+@/api/assistant

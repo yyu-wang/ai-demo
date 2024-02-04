@@ -1,16 +1,12 @@
 <template>
   <div id="layout">
     <div class="left">
+      <!-- 菜单 -->
       <Sider v-model="isCollapse"></Sider>
-      <el-tooltip effect="dark" content="logout" placement="top-start">
-        <div class="log-out">
-          <el-popconfirm title="logout?" @confirm="logOut">
-            <template #reference>
-              <el-icon size="26" color="#999999"><UserFilled /></el-icon>
-            </template>
-          </el-popconfirm>
-        </div>
-      </el-tooltip>
+      <!-- 退出登录 -->
+      <div class="log-out" @click="logOut">
+        <el-icon size="26" color="#999999"><UserFilled /></el-icon>
+      </div>
     </div>
     <div class="right">
       <div class="right-top">
@@ -29,15 +25,22 @@ import { ref } from 'vue'
 import Sider from './sider.vue'
 import RightTop from './rightTop.vue'
 import { useRouter } from 'vue-router'
-
+import { ElMessageBox } from 'element-plus'
 const router = useRouter()
-// 退出登录
+
 const logOut = () => {
-  sessionStorage.removeItem('token')
-  router.push({
-    path: '/login'
+  ElMessageBox.confirm('Log out?', 'Tip', {
+    confirmButtonText: 'Yes',
+    cancelButtonText: 'No',
+    type: 'warning'
+  }).then(() => {
+    sessionStorage.removeItem('token')
+    router.push({
+      path: '/login'
+    })
   })
 }
+
 const isCollapse = ref(false)
 </script>
 <style scoped lang="scss">
@@ -46,7 +49,7 @@ const isCollapse = ref(false)
 
   .left {
     min-height: 100vh;
-    box-shadow: 1px 2px 3px 0px $bg-color;
+    box-shadow: 1px 2px 3px 0px #f2f2f5;
     display: flex;
     flex-direction: column;
     align-items: center;

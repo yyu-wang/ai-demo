@@ -1,10 +1,10 @@
 <template>
-  <el-menu :default-active="defaultActive" :collapse="modelValue">
+  <el-menu :default-active="userStore.menuActive" :collapse="modelValue">
     <el-menu-item
       @click="toRouter(item)"
-      v-for="(item, index) in routerList"
-      :index="numberToString(index)"
-      :key="index"
+      v-for="item in routerList"
+      :index="item.path"
+      :key="item.path"
     >
       <el-icon>
         <component :is="item.meta.icon"></component>
@@ -16,13 +16,10 @@
 <script setup lang="ts">
 import { ref, defineProps, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { numberToString } from '@/utils'
 import { useSystemStore } from '@/stores/system'
 const userStore = useSystemStore()
 const router = useRouter()
 const route = useRoute()
-const defaultActive = ref('0')
-
 defineProps({
   modelValue: {
     type: Boolean,
@@ -35,19 +32,28 @@ const toRouter = (obj: any) => {
   router.push({
     path: obj.path
   })
-  // 修改展示标题
-  userStore.setTitle(obj.meta.title)
+  setSelect(obj.path)
 }
 const routerList = ref<any[]>()
+
 const getRouter = () => {
   const arr = route.matched
   for (let i = 0; i < arr.length; i++) {
     if (arr[i].name === 'layout') {
       routerList.value = arr[i].children
-      if (defaultActive.value === '0') {
-        userStore.setTitle(routerList.value[0].meta.title)
-      }
+      setSelect(route.path)
     }
+  }
+}
+// 设置选中
+const setSelect = (currentPath: string) => {
+  if (routerList.value?.length) {
+    routerList.value.forEach((item) => {
+      if (currentPath === item.path && item && item.meta) {
+        userStore.setMenuActive(item.path)
+        userStore.setTitle(item.meta.title as string)
+      }
+    })
   }
 }
 // 获取当前所有路由信息

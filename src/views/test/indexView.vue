@@ -6,7 +6,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import InputItem from '@/components/inputItem/indexView.vue'
+import InputItem from '@/components/ceshi/index.vue'
 import { ref } from 'vue'
 const value = ref('')
 </script>

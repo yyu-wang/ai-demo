@@ -55,7 +55,8 @@ const router = createRouter({
         //   component: () => import('@/views/test/indexView.vue'),
         //   meta: {
         //     isHide: true,
-        //     title: 'test'
+        //     title: 'test',
+        //     icon: 'Comment'
         //   }
         // }
       ]
@@ -84,6 +85,7 @@ router.beforeEach(async (to, from, next) => {
   // 判断是否有 Token，没有重定向到 login 页面
   if (!token) return next({ path: '/login', replace: true })
 
+  // userStore.setMenuActive(from.path)
   // 正常访问页面
   next()
 })

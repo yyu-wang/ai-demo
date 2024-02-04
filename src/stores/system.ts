@@ -1,17 +1,21 @@
 import { defineStore } from 'pinia'
 interface systemState {
   title: string
+  menuActive: string
 }
 export const useSystemStore = defineStore({
   id: 'system',
   state: (): systemState => ({
-    title: ''
+    title: '',
+    menuActive: '/'
   }),
   getters: {},
   actions: {
     setTitle(title: string) {
-      console.log('title', title)
       this.title = title
+    },
+    setMenuActive(value: string) {
+      this.menuActive = value
     }
   }
 })
