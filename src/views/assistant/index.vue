@@ -17,9 +17,11 @@
     />
   </el-dialog>
   <!-- 内容 -->
-  <div>
+  <div v-loading="!token">
     <div class="top" v-if="tableData.length">
-      <div class="top-title"></div>
+      <div class="top-title">
+        <img class="title-img" src="../../assets//images/edugpt_logo.png" alt="" />
+      </div>
       <div class="top-right">
         <div class="top-btn">
           <el-button class="btn" type="primary" @click="createFn">create</el-button>
@@ -39,17 +41,13 @@
           <template #default="scope">
             <div style="display: flex; justify-content: space-between">
               <el-tooltip effect="dark" content="Delete" placement="top-start">
-                <el-popconfirm title="Delete Assistant?" @confirm="deleteFn(scope.row)">
-                  <template #reference>
-                    <el-icon><Delete /></el-icon>
-                  </template>
-                </el-popconfirm>
+                <el-icon size="20" @click="deleteFn(scope.row)"><Delete /></el-icon>
               </el-tooltip>
               <el-tooltip effect="dark" content="Edit" placement="top-start">
-                <el-icon @click="editFn(scope.row)"><Edit /></el-icon>
+                <el-icon size="20" @click="editFn(scope.row)"><Edit /></el-icon>
               </el-tooltip>
               <el-tooltip effect="dark" content="To Playground" placement="top-start">
-                <el-icon @click="toPlayground(scope.row)"><Promotion /></el-icon>
+                <el-icon size="20" @click="toPlayground(scope.row)"><Promotion /></el-icon>
               </el-tooltip>
             </div>
           </template>
@@ -68,16 +66,20 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, nextTick } from 'vue'
 import CreateForm from '@/components/CreateFrom/index.vue'
 import assistantApi from '@/api/assistant'
 import { formatTimestamp } from '@/utils'
-import { ElMessage } from 'element-plus'
-import { useRouter } from 'vue-router'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { useRouter, useRoute } from 'vue-router'
 import { useSystemStore } from '@/stores/system'
+import { loginSystemStore } from '@/stores/login'
+
+const loginStore = loginSystemStore()
 const userStore = useSystemStore()
 
 const router = useRouter()
+const route = useRoute()
 
 // import { toggleDark } from '@/composables'
 const isDialog = ref(false)
@@ -103,16 +105,28 @@ const createFn = async () => {
 }
 // 删除
 const deleteFn = async (row: any) => {
-  try {
-    await assistantApi.deleteAssistant({ id: row.id })
-    ElMessage({
-      message: 'success!',
-      type: 'success'
+  ElMessageBox.confirm('Are you sure you want to delete this session?', 'Warning', {
+    confirmButtonText: 'Yes',
+    cancelButtonText: 'Cancel'
+  })
+    .then(async () => {
+      try {
+        await assistantApi.deleteAssistant({ id: row.id })
+        ElMessage({
+          message: 'success!',
+          type: 'success'
+        })
+        getList()
+      } catch (error) {
+        console.log(error)
+      }
     })
-    getList()
-  } catch (error) {
-    console.log(error)
-  }
+    .catch(() => {
+      ElMessage({
+        type: 'info',
+        message: 'Cancel'
+      })
+    })
 }
 const formData = ref({})
 // 编辑
@@ -126,7 +140,7 @@ const editFn = (row: any) => {
 const toPlayground = (row: any) => {
   formData.value = { ...row }
   let { id } = row
-  userStore.setMenuActive('/chat')
+  // userStore.setMenuActive('/chat')
   router.push({
     name: 'Playground',
     query: {
@@ -164,10 +178,24 @@ const handleCloseCreateForm = () => {
   isDialog.value = false
   getList()
 }
-
-onMounted(() => {
-  getList()
-})
+const token = ref()
+// 获取地址中的信息实现默认登录
+//http://localhost:5173/assistant?name=wangyu&password=123456
+;(async () => {
+  try {
+    let { name, password } = route.query as any as { name: string; password: string }
+    console.log('name', name)
+    console.log('password', password)
+    if (name && password) {
+      let res = await loginStore.login({ userName: name, password })
+      token.value = res.token
+      getList()
+    }
+  } catch (error) {
+    console.log('error-->', error)
+  }
+})()
+// onMounted(() => {})
 </script>
 <style scoped lang="scss">
 .top {
@@ -182,6 +210,11 @@ onMounted(() => {
 
   .top-title {
     margin-left: 50px;
+    .title-img {
+      height: 55px;
+      width: auto;
+      background-size: auto;
+    }
   }
   .top-right {
     display: flex;

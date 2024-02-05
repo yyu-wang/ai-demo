@@ -44,7 +44,7 @@ api.interceptors.response.use(
       } else if (data.code === 401) {
         sessionStorage.setItem('token', '')
         // token过期
-        router.replace('/login')
+        router.replace('/assistant')
       } else {
         reject({
           message: data.message

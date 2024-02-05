@@ -1,7 +1,9 @@
 <template>
   <div class="content">
     <div class="table-list">
-      <div class="title">Assistants</div>
+      <div class="title">
+        <img class="title-img" src="../../assets//images/edugpt_logo.png" alt="" />
+      </div>
       <div class="table-item-box">
         <div
           v-for="(item, index) in tableData"
@@ -26,18 +28,25 @@
           <div class="chat-box">
             <div class="play-main" ref="chatRef" v-if="msgList.length">
               <div class="item-box" v-for="(item, index) in msgList" :key="index">
-                <div>
+                <div style="margin-top: 10px">
                   <div class="type1">User</div>
-                  <div class="item-content1">
-                    {{ item.message }}
+                  <div class="item-content">
+                    <MarkDownIt v-model="item.message" />
                   </div>
                 </div>
                 <div style="margin-top: 10px">
                   <div class="type2">GPT</div>
 
                   <div class="item-content">
-                    <div v-if="item.result"><MarkDownIt v-model="item.result" /></div>
-                    <div v-else><el-button type="success" text loading></el-button></div>
+                    <div v-if="item.result">
+                      <MarkDownIt v-model="item.result" />
+                      <el-button v-if="isSenMsg" type="primary" size="small" @click="Retry"
+                        >Retry</el-button
+                      >
+                    </div>
+                    <div v-else>
+                      <el-button type="success" text loading></el-button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -55,19 +64,6 @@
                 @keyup.enter="submit"
               />
               <div class="play-btn">
-                <!-- <el-upload
-                  class="upload-demo"
-                  :action="file_url"
-                  :headers="headers"
-                  :show-file-list="false"
-                  :on-success="handleSuccess"
-                  :on-error="handleError"
-                  :limit="1"
-                  :on-exceed="handleExceed"
-                >
-                  <el-icon size="20"><Paperclip /></el-icon>
-                </el-upload> -->
-
                 <el-button
                   type="primary"
                   @click="submit"
@@ -90,22 +86,17 @@
         <div class="session-box">
           <div
             class="session-item"
-            :class="[item.id === currentId ? 'session-item-1' : 'session-item-2']"
+            :class="[item.id == currentSessionId ? 'session-item-1' : 'session-item-2']"
             v-for="item in sessionList"
             :key="item.id"
           >
             <div class="session-text" @click.prevent="getMessageSession(item.id)">
               {{ item.name }}
             </div>
-            <el-popconfirm
-              title="Are you sure you want to delete this session?"
-              @click.stop
-              @confirm="deleteSession(item.id)"
-            >
-              <template #reference>
-                <el-icon><Delete /></el-icon>
-              </template>
-            </el-popconfirm>
+
+            <div @click="deleteSession(item.id)">
+              <el-icon class="session-icon-del"><Delete /></el-icon>
+            </div>
           </div>
         </div>
       </div>
@@ -118,7 +109,7 @@ import { onMounted, ref, nextTick } from 'vue'
 import MarkDownIt from '@/components/MarkDownIt/index.vue'
 import sessionApi from '@/api/session'
 
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { chat_url } from '@/config/index'
 import { useRoute } from 'vue-router'
 // import { EventSource } from './featEvent'
@@ -137,7 +128,7 @@ interface msgItem {
 // assistant ID
 const assistantId = ref<Number | undefined>()
 // 当前会话id
-const currentId = ref<string>('')
+const currentSessionId = ref<string>('')
 // 截取用户发第一个消息的一部分来当作当前会话名称
 const currentName = ref<string>('')
 // 是否是新建会话
@@ -149,55 +140,36 @@ const isSubmit = ref<boolean>(false)
 const msgList = ref<msgItem[]>([])
 // 消息输入框
 const msg = ref()
+// 暂时存的会话消息
+const stagingMsg = ref()
+// 是否发送消息失败
+const isSenMsg = ref<boolean>(false)
 
-// 文件选择
-// 校验
-// const handleExceed: UploadProps['onExceed'] = (files, uploadFiles) => {
-//   ElMessage.warning(
-//     `The limit is 3, you selected ${files.length} files this time, add up to ${
-//       files.length + uploadFiles.length
-//     } totally`
-//   )
-// }
-// // 上传成功
-// const handleSuccess: UploadProps['onSuccess'] = (response: any) => {
-//   let res = response.data[0]
-
-//   console.log('fileList.value', res)
-// }
-// // 上传失败
-// const handleError: UploadProps['onSuccess'] = (error: Error) => {
-//   ElMessage({
-//     message: 'error!',
-//     type: 'error'
-//   })
-//   console.log('error', error)
-// }
-
-// 发送消息
+// 提交发送消息
 const submit = () => {
   if (assistantId.value) {
     //判断是否是当前助手id
     if (msg.value) {
+      stagingMsg.value = msg.value
       //判断当前消息框是否输入了消息
       let obj = {
         message: msg.value,
         result: ''
       }
-
       msgList.value.push(obj)
-      console.log('msgList', msgList.value)
       msg.value = ''
       // 按钮不可用及loading生效
       isSubmit.value = true
       // 设置滚动条位置
       setScrollTopFn(chatRef, nextTick)
-      if (!currentName.value && !currentId.value) {
-        currentName.value = msg.value.substring(0, 15)
+
+      if (!currentName.value && !currentSessionId.value) {
+        currentName.value = stagingMsg.value.substring(0, 15)
         createSession()
       } else {
         sedMessage()
       }
+      // 清除输入框的内容
     }
   } else {
     ElMessage({
@@ -207,20 +179,74 @@ const submit = () => {
   }
 }
 
-// 发送会话
-const sedMessage = async () => {
-  let text = msg.value
-  await sessionApi.sendSession({
-    assistantId: assistantId.value, //当前助手的id
-    threadId: currentId.value, //当前会话的id
-    text
-  })
-  msg.value = ''
+// 发送失败重连参数
+const Retry = () => {
+  isSenMsg.value = true
+  isSubmit.value = true
+  msgList.value[msgList.value.length - 1].result = ''
+  sedMessage()
 }
 
+// 发送会话
+const sedMessage = async () => {
+  try {
+    await sessionApi.sendSession({
+      assistantId: assistantId.value, //当前助手的id
+      threadId: currentSessionId.value, //当前会话的id
+      text: stagingMsg.value
+    })
+  } catch (error) {
+    // 发送会话失败后将输入框按钮释放，并在页面中展示错误信息
+    isSubmit.value = false
+    msgList.value[msgList.value.length - 1].result = 'network error'
+    isSenMsg.value = true
+    console.log('error===>', error)
+  }
+}
+/**
+ * see推送会话
+ * chat_url 推流地址
+ * msgList 会话列表
+ * isSubmit 发送按钮状态
+ */
+// EventSource({ chat_url, msgList, isSubmit })
+
+fetchEventSource(chat_url, {
+  method: 'POST',
+  headers: {
+    Authorization: 'Bearer ' + sessionStorage.getItem('token')
+  },
+
+  async onopen(response) {
+    // console.log('sessionStorage.getItem-)', sessionStorage.getItem('token'))
+
+    console.log('onopen-fetchEventSource', response)
+  },
+
+  onmessage(msg) {
+    let obj = JSON.parse(msg.data)
+
+    // 第一次创建一个新对象在聊天列表中
+    isSubmit.value = false
+    const messageText = Base64.decode(obj.message) // 获取收到的消息文本
+    console.log('messageText', messageText)
+
+    msgList.value[msgList.value.length - 1].result =
+      msgList.value[msgList.value.length - 1].result + messageText
+  },
+  onclose() {
+    console.log('onclose-fetchEventSource', onclose)
+  },
+  onerror(err) {
+    if (!msgList.value[msgList.value.length - 1].result) {
+      msgList.value[msgList.value.length - 1].result = 'network error'
+    }
+
+    console.log('onerror-fetchEventSource', err)
+  }
+})
 // 会话列表
 const sessionList = ref<sessionItem[]>([])
-
 interface sessionItem {
   name: string
   id: string
@@ -229,8 +255,10 @@ interface sessionItem {
 // 按钮新建会话前
 const beforeCreateSession = () => {
   currentName.value = ''
-  currentId.value = ''
+  currentSessionId.value = ''
   isNewSession.value = false
+  isSubmit.value = false
+  stagingMsg.value = ''
   msgList.value = []
 }
 
@@ -240,16 +268,32 @@ const createSession = async () => {
     let id = assistantId.value
     let name = currentName.value
     if (id) {
-      await sessionApi.createSession({ assistantId: id, name })
-      isNewSession.value = true
-      getSessionList()
+      interface SessionResponse {
+        code: number
+        message: string
+      }
+      let res: SessionResponse = await sessionApi.createSession({
+        assistantId: id,
+        name
+      })
+
+      if (res.code !== 200) {
+        ElMessage({
+          message: res.message,
+          type: 'error'
+        })
+      } else {
+        isNewSession.value = true
+
+        getSessionList()
+      }
     }
   } catch (error) {
     ElMessage({
       message: 'Create session failed!',
       type: 'error'
     })
-    console.log(error)
+    console.log('createSession', error)
   }
 }
 // 获取会话列表
@@ -261,37 +305,51 @@ const getSessionList = async () => {
       sessionList.value = res.data.list
       // 如果是新创建的会话的话当前的列表的最新会话id就是当前会话的id
       if (isNewSession.value) {
-        currentId.value = sessionList.value[0].id
+        currentSessionId.value = sessionList.value[0].id
+
         // 开始创建的时候就将第一条消息和搭配拿到的会话id一起发送回去
         sedMessage()
       }
     }
   } catch (error) {
-    console.log(error)
+    console.log('getSessionList', error)
   }
 }
 // 删除会话
-const deleteSession = async (id: string) => {
-  try {
-    await sessionApi.deleteSession({ id })
-    ElMessage({
-      message: 'success!',
-      type: 'success'
+const deleteSession = (id: string) => {
+  ElMessageBox.confirm('Are you sure you want to delete this session?', 'Warning', {
+    confirmButtonText: 'Yes',
+    cancelButtonText: 'Cancel'
+  })
+    .then(async () => {
+      try {
+        await sessionApi.deleteSession({ id })
+        ElMessage({
+          message: 'success!',
+          type: 'success'
+        })
+        getSessionList()
+        beforeCreateSession()
+      } catch (error) {
+        console.log('deleteSession', error)
+      }
     })
-    getSessionList()
-    beforeCreateSession()
-  } catch (error) {
-    console.log(error)
-  }
+    .catch(() => {
+      ElMessage({
+        type: 'info',
+        message: 'Cancel'
+      })
+    })
 }
 // 获取会话聊天记录信息
 const getMessageSession = async (id: string) => {
   try {
     msgList.value = []
+    currentSessionId.value = id
     if (id) {
       let res = await sessionApi.messageList({ threadId: id, page: 1, pageSize: 1000 })
       msgList.value = res.data.list
-      currentId.value = id
+
       nextTick(() => {
         if (chatRef.value) {
           chatRef.value.scrollTop = chatRef.value.scrollHeight
@@ -301,56 +359,17 @@ const getMessageSession = async (id: string) => {
       // console.log('chatRef', chatRef)
     }
   } catch (error) {
-    console.log(error)
+    console.log('getMessageSession', error)
   }
 }
-
-/**
- * see推送会话
- * chat_url 推流地址
- * msgList 会话列表
- * isSubmit 发送按钮状态
- */
-// EventSource({ chat_url, msgList, isSubmit })
-fetchEventSource(chat_url, {
-  method: 'GET',
-  headers: {
-    Authorization: 'Bearer ' + sessionStorage.getItem('token')
-  },
-
-  async onopen(response) {
-    console.log('onopen-fetchEventSource', response)
-  },
-
-  onmessage(msg) {
-    let obj = JSON.parse(msg.data)
-
-    // 第一次创建一个新对象在聊天列表中
-    isSubmit.value = false
-    console.log(' data.isSubmit.value', isSubmit.value)
-
-    const messageText = Base64.decode(obj.message) // 获取收到的消息文本
-    console.log('messageText', messageText)
-    console.log('msgList----------', msgList.value[msgList.value.length - 1])
-
-    msgList.value[msgList.value.length - 1].result =
-      msgList.value[msgList.value.length - 1].result + messageText
-  },
-  onclose() {
-    console.log('onclose-fetchEventSource', onclose)
-  },
-  onerror(err) {
-    if (msgList.value[msgList.value.length - 1].result) {
-      msgList.value[msgList.value.length - 1].result = 'network error'
-    }
-
-    console.log('onerror-fetchEventSource', err)
-  }
-})
 
 // 选择助手
 const slectAssistant = (e: any) => {
   assistantId.value = Number(e.id)
+  console.log('currentSessionId====>', currentSessionId.value)
+
+  currentSessionId.value = '' // 切换助手的时候将会话ID清除掉
+  console.log('currentSessionId2222====>', currentSessionId.value)
   msgList.value = []
   getSessionList()
 }
@@ -365,19 +384,13 @@ const getList = async () => {
       pageSize: 100
     })
     tableData.value = res.data.list
-
-    // for (let index = 0; index < 20; index++) {
-    //   tableData.value.push({ id: 0 })
-    // }
   } catch (error) {
-    console.log(error)
+    console.log('getList', error)
   }
 }
 onMounted(() => {
-  currentName.value = ''
-  currentId.value = ''
-  isSubmit.value = false
-  msgList.value = []
+  beforeCreateSession()
+
   let { id } = route.query as any as { id: string }
   getList()
   if (id) {
@@ -409,6 +422,11 @@ onMounted(() => {
       align-items: center;
       font-size: 30px;
       font-weight: bold;
+      .title-img {
+        height: 55px;
+        width: auto;
+        background-size: auto;
+      }
     }
     .table-item-box {
       background: #ffffff;
@@ -501,22 +519,14 @@ onMounted(() => {
               .type1 {
                 font-size: 16px;
                 font-weight: bold;
-                color: green;
+                color: $font-color;
               }
               .type2 {
                 font-size: 16px;
                 font-weight: bold;
-                color: $font-color;
+                color: rgb(255, 0, 138);
               }
-              .item-content1 {
-                font-size: 14px;
-                color: #333333;
-                line-height: 30px;
-                background: $bg-color;
-                border-radius: 6px;
-                padding: 0 10px;
-                margin-top: 10px;
-              }
+
               .item-content {
                 font-size: 14px;
                 color: #333333;
@@ -582,7 +592,7 @@ onMounted(() => {
 
         .session-item {
           width: calc(90% - 20px);
-          padding: 10px;
+          padding: 0 10px;
           display: flex;
           justify-content: space-between;
           font-size: 15px;
@@ -590,11 +600,19 @@ onMounted(() => {
           border-radius: 10px;
           margin-top: 10px;
           .session-text {
-            width: 200px;
-            height: 20px;
+            flex: 1;
+            height: 30px;
+            padding-top: 10px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+          }
+          .session-icon-del {
+            width: 40px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
           }
         }
         .session-item-1 {

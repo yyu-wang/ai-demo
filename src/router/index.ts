@@ -76,14 +76,14 @@ router.beforeEach(async (to, from, next) => {
   document.title = to.meta.title ? `${to.meta.title} - ${title}` : title
 
   // 3.判断是访问登陆页，有 Token 就在当前页面，没有 Token 重置路由到登陆页
-  const token = sessionStorage.getItem('token')
-  if (to.path.toLocaleLowerCase() === '/login') {
-    if (token) return next(from.fullPath)
-    return next()
-  }
+  // const token = sessionStorage.getItem('token')
+  // if (to.path.toLocaleLowerCase() === '/login') {
+  //   if (token) return next(from.fullPath)
+  //   return next()
+  // }
 
-  // 判断是否有 Token，没有重定向到 login 页面
-  if (!token) return next({ path: '/login', replace: true })
+  // // 判断是否有 Token，没有重定向到 login 页面
+  // if (!token) return next({ path: '/login', replace: true })
 
   // userStore.setMenuActive(from.path)
   // 正常访问页面

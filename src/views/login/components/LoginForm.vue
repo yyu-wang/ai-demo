@@ -52,16 +52,19 @@ import { ElForm } from 'element-plus'
 import { reactive, ref } from 'vue'
 // import { CircleClose, UserFilled } from '@element-plus/icons-vue'
 import loginApi from '@/api/login' // 导入封装的 PostApi
-import { ElMessage, ElNotification } from 'element-plus'
-import { getTimeState } from '@/utils'
+import { ElMessage } from 'element-plus'
+// import { getTimeState } from '@/utils'
 import { useRouter } from 'vue-router'
+import { loginSystemStore } from '@/stores/login'
+
+const loginStore = loginSystemStore()
 const router = useRouter()
 type FormInstance = InstanceType<typeof ElForm>
 
 interface ReqLoginForm {
-  userName: ''
-  password: ''
-  rePassword: ''
+  userName: string
+  password: string
+  rePassword: string
 }
 
 const loginFormRef = ref<FormInstance>()
@@ -110,23 +113,18 @@ const login = (formEl: FormInstance | undefined) => {
 // 登录
 const submitLogin = async () => {
   try {
-    let { userName, password } = loginForm
-    let res = await loginApi.login({
-      userName,
-      password
-    })
+    let res = await loginStore.login(loginForm)
     if ((res as responseType).token) {
-      sessionStorage.setItem('token', (res as responseType).token!)
       // 4.跳转到首页
       router.push({
-        path: '/'
+        path: '/assistant'
       })
-      ElNotification({
-        title: getTimeState(),
-        message: 'Welcome',
-        type: 'success',
-        duration: 3000
-      })
+      // ElNotification({
+      //   title: getTimeState(),
+      //   message: 'Welcome',
+      //   type: 'success',
+      //   duration: 3000
+      // })
     }
   } catch (error: any) {
     ElMessage({
