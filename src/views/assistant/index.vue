@@ -3,7 +3,7 @@
 
   <el-dialog
     v-model="isDialog"
-    :title="createType"
+    :title="capitalizeFirstLetter(createType)"
     width="500"
     :before-close="handleClose"
     :close-on-click-modal="false"
@@ -32,7 +32,20 @@
     <div v-show="tableData.length" class="tableData-box">
       <el-table :data="tableData" border style="width: 100%">
         <el-table-column align="center" prop="name" label="Name" width="180" />
-        <el-table-column align="center" prop="instructions" label="Instructions" />
+        <el-table-column align="center" prop="instructions" label="Instructions">
+          <template #default="scope">
+            <el-tooltip
+              class="box-item"
+              effect="dark"
+              :content="scope.row.instructions"
+              placement="top-start"
+            >
+              <div class="instructions">
+                {{ scope.row.instructions }}
+              </div>
+            </el-tooltip>
+          </template>
+        </el-table-column>
         <el-table-column align="center" prop="id" label="ID" />
         <el-table-column align="center" prop="createdTime" label="Date Created">
           <template #default="scope">{{ formatTimestamp(scope.row.created_at) }}</template>
@@ -72,11 +85,10 @@ import assistantApi from '@/api/assistant'
 import { formatTimestamp } from '@/utils'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useRouter, useRoute } from 'vue-router'
-import { useSystemStore } from '@/stores/system'
-import { loginSystemStore } from '@/stores/login'
+
+import { loginSystemStore } from '@/stores/modules/login'
 
 const loginStore = loginSystemStore()
-const userStore = useSystemStore()
 
 const router = useRouter()
 const route = useRoute()
@@ -178,17 +190,27 @@ const handleCloseCreateForm = () => {
   isDialog.value = false
   getList()
 }
+const capitalizeFirstLetter = (str: string) => {
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}
 const token = ref()
 // 获取地址中的信息实现默认登录
 //http://localhost:5173/assistant?name=wangyu&password=123456
 ;(async () => {
   try {
     let { name, password } = route.query as any as { name: string; password: string }
-    console.log('name', name)
-    console.log('password', password)
+    // console.log('name', name)
+    // console.log('password', password)
+
     if (name && password) {
+      sessionStorage.setItem('userName', name)
+      sessionStorage.setItem('password', password)
       let res = await loginStore.login({ userName: name, password })
+
       token.value = res.token
+      getList()
+    } else {
+      token.value = sessionStorage.getItem('token')
       getList()
     }
   } catch (error) {
@@ -235,6 +257,15 @@ const token = ref()
   overflow: auto;
   margin: 0 auto;
   border-radius: 10px;
+  .instructions {
+    width: 100%;
+    max-height: 80px;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: default;
+  }
   // padding: 10px;
   :deep(.el-table th.el-table__cell) {
     background-color: #fafafa !important;

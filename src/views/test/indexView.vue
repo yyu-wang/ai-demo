@@ -1,6 +1,6 @@
 <template>
   <div class="main">
-    父组件： {{ value }}
+    <div>111{{ $t('home.welcome') }}</div>
 
     <InputItem :placeholder="'请输入'" v-model="value"></InputItem>
   </div>

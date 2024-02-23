@@ -1,22 +1,29 @@
 <template>
-  <el-menu :default-active="userStore.menuActive" :collapse="modelValue">
-    <el-menu-item
-      @click="toRouter(item)"
-      v-for="item in routerList"
-      :index="item.path"
-      :key="item.path"
-    >
-      <el-icon>
-        <component :is="item.meta.icon"></component>
-      </el-icon>
-      <span>{{ item.meta.title }}</span>
-    </el-menu-item>
-  </el-menu>
+  <div>
+    <div class="logo-box">
+      <div class="img-logo" v-if="!modelValue"></div>
+      <div class="img-icon" v-else></div>
+    </div>
+
+    <el-menu :default-active="userStore.menuActive" :collapse="modelValue">
+      <el-menu-item
+        @click="toRouter(item)"
+        v-for="item in routerList"
+        :index="item.path"
+        :key="item.path"
+      >
+        <el-icon>
+          <component :is="item.meta.icon"></component>
+        </el-icon>
+        <span>{{ item.meta.title }}</span>
+      </el-menu-item>
+    </el-menu>
+  </div>
 </template>
 <script setup lang="ts">
 import { ref, defineProps, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { useSystemStore } from '@/stores/system'
+import { useSystemStore } from '@/stores/modules/system'
 const userStore = useSystemStore()
 const router = useRouter()
 const route = useRoute()
@@ -62,14 +69,33 @@ onMounted(() => {
 })
 </script>
 <style lang="scss" scoped>
+.logo-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .img-logo {
+    max-width: 200px;
+    height: auto;
+    background: url(../assets/images/edugpt_logo.png);
+  }
+
+  .img-icon {
+    max-width: 50px;
+    height: auto;
+    background: url(../assets/images/edugpt_browser-icon.png);
+  }
+}
+
 .el-menu {
   border-right: none;
+  background-color: $bg-color;
 }
 .el-menu-item.is-active {
-  color: $basic-color;
+  color: #ffffff;
+  background-color: $basic-color;
 }
 .el-menu-item:hover {
-  background-color: $bg-color;
-  color: $font-color;
+  background-color: $basic-color;
+  color: #ffffff;
 }
 </style>

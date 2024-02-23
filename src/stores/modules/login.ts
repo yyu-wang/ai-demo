@@ -1,14 +1,6 @@
 import { defineStore } from 'pinia'
 import loginApi from '@/api/login' // 导入封装的 PostApi
-
-interface LoginState {
-  token: string
-}
-interface ReqLoginForm {
-  userName: string
-  password: string
-  //   rePassword: ''
-}
+import { LoginState, ReqLoginForm } from '@/stores/interface'
 
 export const loginSystemStore = defineStore({
   id: 'system',
@@ -23,6 +15,8 @@ export const loginSystemStore = defineStore({
         userName,
         password
       })
+      console.log('111', res)
+
       sessionStorage.setItem('token', res.token)
       return res
     }

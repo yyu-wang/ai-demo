@@ -1,8 +1,10 @@
 <template>
   <div class="login-container flx-center">
     <div class="login-box">
+      <img class="logo" src="../../assets/images/edugpt_logo.png" alt="" />
+      <div class="lg"><Lunguage /></div>
       <div class="login-form">
-        <div class="logo-text">demo</div>
+        <div class="logo-text">{{ $t('login.title') }}</div>
         <LoginForm />
       </div>
     </div>
@@ -10,13 +12,14 @@
 </template>
 <script setup lang="ts" name="login">
 import LoginForm from './components/LoginForm.vue'
+import Lunguage from '@/layout/components/headerCompopents/Lunguage.vue'
 </script>
 
 <style scoped lang="scss">
 .login-container {
   height: 100%;
   min-height: 550px;
-  background-color: #eeeeee;
+  background-color: $bg-color;
   background-image: url('@/assets/images/login_bg.svg');
   background-size: 100% 100%;
   background-size: cover;
@@ -33,6 +36,17 @@ import LoginForm from './components/LoginForm.vue'
   padding: 0 50px;
   background-color: rgb(255 255 255 / 80%);
   border-radius: 10px;
+  .logo {
+    position: absolute;
+    width: 200px;
+    left: 32px;
+    top: 10px;
+  }
+  .lg {
+    position: absolute;
+    right: 32px;
+    top: 10px;
+  }
   .login-form {
     width: 420px;
     padding: 50px 40px 45px;
@@ -43,7 +57,7 @@ import LoginForm from './components/LoginForm.vue'
     .logo-text {
       padding: 0 0 0 25px;
       margin: 0 0 30px 0;
-      font-size: 42px;
+      font-size: 32px;
       font-weight: bold;
       color: #34495e;
       white-space: nowrap;

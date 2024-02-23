@@ -2,7 +2,9 @@
   <div class="content">
     <div class="table-list">
       <div class="title">
-        <img class="title-img" src="../../assets//images/edugpt_logo.png" alt="" />
+        <router-link :to="path">
+          <img class="title-img" src="../../assets/images/edugpt_logo.png" alt=""
+        /></router-link>
       </div>
       <div class="table-item-box">
         <div
@@ -16,7 +18,7 @@
       </div>
     </div>
     <div class="playground">
-      <div class="playground-left">
+      <div class="playground-left" v-loading="messageLoading">
         <div class="right-main">
           <div class="p-top">
             <div class="left">THREAD</div>
@@ -29,13 +31,39 @@
             <div class="play-main" ref="chatRef" v-if="msgList.length">
               <div class="item-box" v-for="(item, index) in msgList" :key="index">
                 <div style="margin-top: 10px">
-                  <div class="type1">User</div>
+                  <div class="type-box">
+                    <div class="type-icon icon1">
+                      <el-icon size="30"><UserFilled /></el-icon>
+                    </div>
+
+                    <div class="type1">{{ user }}</div>
+                  </div>
+
                   <div class="item-content">
                     <MarkDownIt v-model="item.message" />
                   </div>
                 </div>
                 <div style="margin-top: 10px">
-                  <div class="type2">GPT</div>
+                  <div class="type-box">
+                    <div class="type-icon icon2">
+                      <svg
+                        aria-hidden="true"
+                        focusable="false"
+                        data-prefix="fas"
+                        data-icon="robot"
+                        class="svg-inline--fa fa-robot fa-2x w-20 h-20 m-auto"
+                        role="img"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 640 512"
+                      >
+                        <path
+                          fill="currentColor"
+                          d="M320 0c17.7 0 32 14.3 32 32V96H472c39.8 0 72 32.2 72 72V440c0 39.8-32.2 72-72 72H168c-39.8 0-72-32.2-72-72V168c0-39.8 32.2-72 72-72H288V32c0-17.7 14.3-32 32-32zM208 384c-8.8 0-16 7.2-16 16s7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H208zm96 0c-8.8 0-16 7.2-16 16s7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H304zm96 0c-8.8 0-16 7.2-16 16s7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H400zM264 256a40 40 0 1 0 -80 0 40 40 0 1 0 80 0zm152 40a40 40 0 1 0 0-80 40 40 0 1 0 0 80zM48 224H64V416H48c-26.5 0-48-21.5-48-48V272c0-26.5 21.5-48 48-48zm544 0c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H576V224h16z"
+                        ></path>
+                      </svg>
+                    </div>
+                    <div class="type2">EduGPT</div>
+                  </div>
 
                   <div class="item-content">
                     <div v-if="item.result">
@@ -83,14 +111,15 @@
           <el-button type="primary" @click="beforeCreateSession">Create a new session</el-button>
         </div>
 
-        <div class="session-box">
+        <div class="session-box" v-loading="sessionLoading">
           <div
+            v-show="sessionList.length > 0"
             class="session-item"
             :class="[item.id == currentSessionId ? 'session-item-1' : 'session-item-2']"
             v-for="item in sessionList"
             :key="item.id"
           >
-            <div class="session-text" @click.prevent="getMessageSession(item.id)">
+            <div class="session-text" @click.prevent="getMessageSession(item)">
               {{ item.name }}
             </div>
 
@@ -98,6 +127,7 @@
               <el-icon class="session-icon-del"><Delete /></el-icon>
             </div>
           </div>
+          <div style="margin-top: 20px" v-show="sessionList.length <= 0">No Data</div>
         </div>
       </div>
     </div>
@@ -112,7 +142,7 @@ import sessionApi from '@/api/session'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { chat_url } from '@/config/index'
 import { useRoute } from 'vue-router'
-// import { EventSource } from './featEvent'
+
 import { setScrollTopFn } from './index'
 import { fetchEventSource } from '@microsoft/fetch-event-source'
 import { Base64 } from 'js-base64'
@@ -125,10 +155,17 @@ interface msgItem {
   result: string
   message: string
 }
+const path = ref<string>()
+path.value = `/assistant?name=${sessionStorage.getItem(
+  'userName'
+)}&password=${sessionStorage.getItem('password')}`
+const user = ref<string | null>(sessionStorage.getItem('userName'))
 // assistant ID
 const assistantId = ref<Number | undefined>()
 // 当前会话id
 const currentSessionId = ref<string>('')
+// 聊天id
+const threadAppId = ref<string>('')
 // 截取用户发第一个消息的一部分来当作当前会话名称
 const currentName = ref<string>('')
 // 是否是新建会话
@@ -136,6 +173,8 @@ const isNewSession = ref<boolean>(false)
 // 发送按钮是否可用
 const isSubmit = ref<boolean>(false)
 
+// 获取消息loading
+const messageLoading = ref(false)
 // 消息队列
 const msgList = ref<msgItem[]>([])
 // 消息输入框
@@ -144,6 +183,15 @@ const msg = ref()
 const stagingMsg = ref()
 // 是否发送消息失败
 const isSenMsg = ref<boolean>(false)
+
+// 会话列表loading
+const sessionLoading = ref(false)
+// 会话列表
+const sessionList = ref<sessionItem[]>([])
+interface sessionItem {
+  name: string
+  id: string
+}
 
 // 提交发送消息
 const submit = () => {
@@ -190,6 +238,51 @@ const Retry = () => {
 // 发送会话
 const sedMessage = async () => {
   try {
+    // 连接see
+    console.log('threadAppId', threadAppId.value)
+    fetchEventSource(chat_url, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + sessionStorage.getItem('token'),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ threadAppId: threadAppId.value }),
+
+      async onopen(response) {
+        console.log('onopen-fetchEventSource', response)
+      },
+
+      onmessage(msg) {
+        let obj = JSON.parse(msg.data)
+
+        // 第一次创建一个新对象在聊天列表中
+        isSubmit.value = false
+        const messageText = Base64.decode(obj.message) // 获取收到的消息文本
+        console.log('messageText', messageText)
+
+        msgList.value[msgList.value.length - 1].result =
+          msgList.value[msgList.value.length - 1].result + messageText
+        isSenMsg.value = false
+        setScrollTopFn(chatRef, nextTick)
+      },
+      onclose() {
+        console.log('onclose-fetchEventSource', onclose)
+      },
+      onerror(err) {
+        console.log('onerror-fetchEventSource', err)
+        // if (!msgList.value[msgList.value.length - 1].result) {
+        //   msgList.value[msgList.value.length - 1].result = 'network error'
+        // }
+      }
+    })
+  } catch (error) {
+    console.log('fetchEventSource===>', error)
+  }
+
+  try {
+    console.log('stagingMsg.value', stagingMsg.value)
+
+    // 发送消息
     await sessionApi.sendSession({
       assistantId: assistantId.value, //当前助手的id
       threadId: currentSessionId.value, //当前会话的id
@@ -203,53 +296,28 @@ const sedMessage = async () => {
     console.log('error===>', error)
   }
 }
-/**
- * see推送会话
- * chat_url 推流地址
- * msgList 会话列表
- * isSubmit 发送按钮状态
- */
-// EventSource({ chat_url, msgList, isSubmit })
+// 选择助手
+const slectAssistant = (e: any) => {
+  assistantId.value = Number(e.id)
+  // 切换助手前将会话参数重置==等同于新建会话
+  beforeCreateSession()
+  sessionLoading.value = true
+  getSessionList()
+}
 
-fetchEventSource(chat_url, {
-  method: 'POST',
-  headers: {
-    Authorization: 'Bearer ' + sessionStorage.getItem('token')
-  },
-
-  async onopen(response) {
-    // console.log('sessionStorage.getItem-)', sessionStorage.getItem('token'))
-
-    console.log('onopen-fetchEventSource', response)
-  },
-
-  onmessage(msg) {
-    let obj = JSON.parse(msg.data)
-
-    // 第一次创建一个新对象在聊天列表中
-    isSubmit.value = false
-    const messageText = Base64.decode(obj.message) // 获取收到的消息文本
-    console.log('messageText', messageText)
-
-    msgList.value[msgList.value.length - 1].result =
-      msgList.value[msgList.value.length - 1].result + messageText
-  },
-  onclose() {
-    console.log('onclose-fetchEventSource', onclose)
-  },
-  onerror(err) {
-    if (!msgList.value[msgList.value.length - 1].result) {
-      msgList.value[msgList.value.length - 1].result = 'network error'
-    }
-
-    console.log('onerror-fetchEventSource', err)
+// 助手列表
+const tableData = ref()
+// 获取助手列表
+const getList = async () => {
+  try {
+    let res = await assistantApi.listAssistant({
+      page: 1,
+      pageSize: 100
+    })
+    tableData.value = res.data.list
+  } catch (error) {
+    console.log('getList', error)
   }
-})
-// 会话列表
-const sessionList = ref<sessionItem[]>([])
-interface sessionItem {
-  name: string
-  id: string
 }
 
 // 按钮新建会话前
@@ -303,9 +371,12 @@ const getSessionList = async () => {
     if (id) {
       let res = await sessionApi.listSession({ assistantId: id, page: 1, pageSize: 1000 })
       sessionList.value = res.data.list
+      sessionLoading.value = false
+
       // 如果是新创建的会话的话当前的列表的最新会话id就是当前会话的id
       if (isNewSession.value) {
         currentSessionId.value = sessionList.value[0].id
+        threadAppId.value = sessionList.value[0].threadAppId
 
         // 开始创建的时候就将第一条消息和搭配拿到的会话id一起发送回去
         sedMessage()
@@ -342,12 +413,14 @@ const deleteSession = (id: string) => {
     })
 }
 // 获取会话聊天记录信息
-const getMessageSession = async (id: string) => {
+const getMessageSession = async (item: any) => {
   try {
     msgList.value = []
-    currentSessionId.value = id
-    if (id) {
-      let res = await sessionApi.messageList({ threadId: id, page: 1, pageSize: 1000 })
+    currentSessionId.value = item.id
+    threadAppId.value = item.threadAppId
+    messageLoading.value = true
+    if (item.id) {
+      let res = await sessionApi.messageList({ threadId: item.id, page: 1, pageSize: 1000 })
       msgList.value = res.data.list
 
       nextTick(() => {
@@ -356,6 +429,8 @@ const getMessageSession = async (id: string) => {
         }
       })
       setScrollTopFn(chatRef, nextTick)
+      messageLoading.value = false
+
       // console.log('chatRef', chatRef)
     }
   } catch (error) {
@@ -363,31 +438,6 @@ const getMessageSession = async (id: string) => {
   }
 }
 
-// 选择助手
-const slectAssistant = (e: any) => {
-  assistantId.value = Number(e.id)
-  console.log('currentSessionId====>', currentSessionId.value)
-
-  currentSessionId.value = '' // 切换助手的时候将会话ID清除掉
-  console.log('currentSessionId2222====>', currentSessionId.value)
-  msgList.value = []
-  getSessionList()
-}
-
-// 助手列表
-const tableData = ref()
-// 获取助手列表
-const getList = async () => {
-  try {
-    let res = await assistantApi.listAssistant({
-      page: 1,
-      pageSize: 100
-    })
-    tableData.value = res.data.list
-  } catch (error) {
-    console.log('getList', error)
-  }
-}
 onMounted(() => {
   beforeCreateSession()
 
@@ -426,6 +476,7 @@ onMounted(() => {
         height: 55px;
         width: auto;
         background-size: auto;
+        cursor: pointer;
       }
     }
     .table-item-box {
@@ -515,16 +566,31 @@ onMounted(() => {
               display: flex;
               flex-direction: column;
               margin: 0 10px;
+              .type-box {
+                display: flex;
+                align-items: center;
+                .type-icon {
+                  width: 30px;
+                  height: 30px;
 
-              .type1 {
-                font-size: 16px;
-                font-weight: bold;
-                color: $font-color;
-              }
-              .type2 {
-                font-size: 16px;
-                font-weight: bold;
-                color: rgb(255, 0, 138);
+                  margin-right: 10px;
+                }
+                .icon1 {
+                  color: $font-color;
+                }
+                .icon2 {
+                  color: rgb(255, 0, 138);
+                }
+                .type1 {
+                  font-size: 16px;
+                  font-weight: bold;
+                  color: $font-color;
+                }
+                .type2 {
+                  font-size: 16px;
+                  font-weight: bold;
+                  color: rgb(255, 0, 138);
+                }
               }
 
               .item-content {
@@ -542,7 +608,7 @@ onMounted(() => {
           .play-tip {
             margin: 0 auto;
             padding-bottom: 20px;
-            width: calc(100% - 100px);
+            width: 100%;
             height: 600px;
             display: flex;
             align-items: center;

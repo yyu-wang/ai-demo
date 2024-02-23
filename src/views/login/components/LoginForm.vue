@@ -3,7 +3,7 @@
     <el-form-item prop="userName">
       <el-input
         v-model="loginForm.userName"
-        placeholder="userName"
+        :placeholder="$t('login.usernamePlaceholder')"
         @keyup.enter="login(loginFormRef)"
       >
       </el-input>
@@ -12,7 +12,7 @@
       <el-input
         v-model="loginForm.password"
         type="password"
-        placeholder="password"
+        :placeholder="$t('login.passwordPlaceholder')"
         show-password
         autocomplete="new-password"
         @keyup.enter="login(loginFormRef)"
@@ -23,7 +23,7 @@
       <el-input
         v-model="loginForm.rePassword"
         type="password"
-        placeholder="Enter password again"
+        :placeholder="$t('login.rePasswordPlaceholder')"
         show-password
         autocomplete="new-password"
         @keyup.enter="login(loginFormRef)"
@@ -36,13 +36,13 @@
       Reset
     </el-button> -->
     <el-button round size="large" type="primary" :loading="loading" @click="login(loginFormRef)">
-      {{ isLogin ? 'Login' : 'Register' }}
+      {{ isLogin ? $t('login.loginButton') : $t('login.registerButton') }}
     </el-button>
   </div>
   <div class="text">
-    {{ isLogin ? 'No account?' : 'back' }}
+    {{ isLogin ? $t('login.promptTextOne') : $t('login.promptTextTwo') }}
     <el-button @click="registerFn" type="success" link>
-      {{ isLogin ? 'Register' : 'Login' }}</el-button
+      {{ isLogin ? $t('login.registerButton') : $t('login.loginButton') }}</el-button
     >
   </div>
 </template>
@@ -55,7 +55,10 @@ import loginApi from '@/api/login' // 导入封装的 PostApi
 import { ElMessage } from 'element-plus'
 // import { getTimeState } from '@/utils'
 import { useRouter } from 'vue-router'
-import { loginSystemStore } from '@/stores/login'
+import { loginSystemStore } from '@/stores/modules/login'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const loginStore = loginSystemStore()
 const router = useRouter()
@@ -74,13 +77,20 @@ const loginForm = reactive<ReqLoginForm>({
   password: '',
   rePassword: ''
 })
+
 const loading = ref(false)
+
+const loginRules = ref()
+
 // 表单校验
-const loginRules = reactive({
-  userName: [{ required: true, message: 'please enter user name', trigger: 'blur' }],
-  password: [{ required: true, message: 'please enter password', trigger: 'blur' }],
-  rePassword: [{ required: true, message: 'Please enter password again', trigger: 'blur' }]
-})
+const getLoginI18nSetRules = () => {
+  loginRules.value = {
+    userName: [{ required: true, message: t('login.userNameRules'), trigger: 'blur' }],
+    password: [{ required: true, message: t('login.passwordRules'), trigger: 'blur' }],
+    rePassword: [{ required: true, message: t('login.rePasswordRules'), trigger: 'blur' }]
+  }
+}
+
 interface responseType {
   token?: string
   code?: number
@@ -89,8 +99,9 @@ interface responseType {
   // 其他可能的属性
 }
 const isLogin = ref(true)
-// login
+// 登录
 const login = (formEl: FormInstance | undefined) => {
+  getLoginI18nSetRules()
   if (!formEl) return
   formEl.validate(async (valid) => {
     if (!valid) return
@@ -117,7 +128,7 @@ const submitLogin = async () => {
     if ((res as responseType).token) {
       // 4.跳转到首页
       router.push({
-        path: '/assistant'
+        path: '/'
       })
       // ElNotification({
       //   title: getTimeState(),

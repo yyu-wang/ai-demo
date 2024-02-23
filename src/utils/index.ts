@@ -13,7 +13,7 @@ export function getTimeState() {
 }
 
 // 时间戳转YYYY-MM-DD 格式
-export function formatTimestamp(timestamp: string) {
+export function formatTimestamp(timestamp: number) {
   const date = new Date(timestamp * 1000)
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, '0')
@@ -31,4 +31,22 @@ export function numberToString(value: Number): string {
   let newValue: string = ''
   newValue = value.toString()
   return newValue
+}
+
+/**
+ * @description 获取浏览器默认语言
+ * @returns {String}
+ */
+export function getBrowserLang() {
+  let browserLang = navigator.language
+
+  let defaultBrowserLang = ''
+  if (['cn', 'zh', 'zh-cn'].includes(browserLang.toLowerCase())) {
+    defaultBrowserLang = 'zh'
+  } else if (['zh-HK', 'zh-hk'].includes(browserLang.toLowerCase())) {
+    defaultBrowserLang = 'zh-hk'
+  } else {
+    defaultBrowserLang = 'en'
+  }
+  return defaultBrowserLang
 }

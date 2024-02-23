@@ -43,7 +43,7 @@
           <div class="tool-item">
             <div>Code interpreter</div>
             <div>
-              <el-switch v-model="formData.codeInterpreter" style="--el-switch-on-color: #1a94bc" />
+              <el-switch v-model="formData.codeInterpreter" style="--el-switch-on-color: #4460dc" />
             </div>
           </div>
           <div class="tool-item">
@@ -52,7 +52,7 @@
               <el-switch
                 :disabled="isSwitchDisabled"
                 v-model="formData.retrieval"
-                style="--el-switch-on-color: #1a94bc"
+                style="--el-switch-on-color: #4460dc"
               />
             </div>
           </div>
@@ -294,10 +294,12 @@ const create = async () => {
       emit('handleGet', id)
     }
   } catch (error) {
+    saveLoading.value = false
     ElMessage({
       message: 'Error',
       type: 'error'
     })
+
     console.log(error)
   }
 }
@@ -318,6 +320,7 @@ const edit = async () => {
       emit('handleGet', id)
     }
   } catch (error) {
+    saveLoading.value = false
     ElMessage({
       message: 'Error',
       type: 'error'

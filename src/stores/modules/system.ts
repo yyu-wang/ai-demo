@@ -1,8 +1,5 @@
 import { defineStore } from 'pinia'
-interface systemState {
-  title: string
-  menuActive: string
-}
+import { systemState } from '@/stores/interface'
 export const useSystemStore = defineStore({
   id: 'system',
   state: (): systemState => ({
