@@ -14,6 +14,7 @@ const globalStore = useGlobalStore()
 const i18n = useI18n()
 onMounted(() => {
   const language = globalStore.language ?? getBrowserLang()
+
   i18n.locale.value = language
   globalStore.setGlobalState('language', language as LanguageType)
 })

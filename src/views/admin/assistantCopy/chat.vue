@@ -1,11 +1,7 @@
 <template>
   <div class="content">
     <div class="table-list">
-      <div class="title">
-        <router-link :to="path">
-          <img class="title-img" src="../../assets/images/edugpt_logo.png" alt=""
-        /></router-link>
-      </div>
+      <div class="title"></div>
       <div class="table-item-box">
         <div
           v-for="(item, index) in tableData"
@@ -158,10 +154,7 @@ interface msgItem {
   result: string
   message: string
 }
-const path = ref<string>()
-path.value = `/assistant?name=${sessionStorage.getItem(
-  'userName'
-)}&password=${sessionStorage.getItem('password')}`
+
 const user = ref<string | null>(sessionStorage.getItem('userName'))
 // assistant ID
 const assistantId = ref<Number | undefined>()
@@ -460,6 +453,7 @@ onMounted(() => {
   display: flex;
   flex-direction: row;
   height: 100%;
+  background: $bg-color;
 
   .table-list {
     display: flex;
@@ -469,7 +463,7 @@ onMounted(() => {
     height: 100%;
 
     .title {
-      height: 100px;
+      height: 20px;
       text-align: center;
       display: flex;
       align-items: center;
@@ -485,7 +479,7 @@ onMounted(() => {
     .table-item-box {
       background: #ffffff;
       width: 360px;
-      height: calc(100% - 150px);
+      height: calc(100% - 70px);
       border-radius: 10px;
       overflow-y: auto;
       display: flex;
@@ -559,7 +553,7 @@ onMounted(() => {
             padding-bottom: 20px;
             width: 100%;
             flex-wrap: wrap;
-            height: 720px;
+            height: 660px;
             overflow-y: auto;
             background: #ffffff;
             border-radius: 10px;
@@ -651,7 +645,7 @@ onMounted(() => {
       }
       .session-box {
         width: 360px;
-        height: calc(100vh - 150px);
+        height: calc(100vh - 230px);
         display: flex;
         align-items: center;
         flex-direction: column;

@@ -17,23 +17,21 @@
     />
   </el-dialog>
   <!-- 内容 -->
-  <div v-loading="!token">
+  <div>
     <div class="top" v-if="tableData.length">
       <div class="top-title">
-        <img class="title-img" src="../../assets/images/edugpt_logo.png" alt="" />
+        <!-- <img class="title-img" src="../../assets/images/edugpt_logo.png" alt="" /> -->
       </div>
       <div class="top-right">
-        <Lunguage />
-        <Avatar />
+        <div class="top-btn">
+          <el-button class="btn" type="primary" @click="createFn">{{
+            t('assistant.createText')
+          }}</el-button>
+        </div>
       </div>
     </div>
     <!-- 应用列表 -->
     <div v-show="tableData.length" class="tableData-box">
-      <div class="top-btn">
-        <el-button class="btn" type="primary" @click="createFn">{{
-          t('assistant.createText')
-        }}</el-button>
-      </div>
       <el-table :data="tableData" border style="width: 100%">
         <el-table-column align="center" prop="name" :label="t('assistant.tab.name')" width="180" />
         <el-table-column
@@ -91,26 +89,18 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ref, nextTick } from 'vue'
+import { ref, nextTick, onMounted } from 'vue'
 import CreateForm from '@/components/CreateFrom/index.vue'
 import assistantApi from '@/api/assistant'
 import { formatTimestamp } from '@/utils'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { useRouter, useRoute } from 'vue-router'
-import loginApi from '@/api/login' // 导入封装的 PostApi
-import Lunguage from '@/layout/components/headerCompopents/Lunguage.vue'
-import Avatar from '@/layout/components/headerCompopents/Avatar.vue'
-// import { loginSystemStore } from '@/stores/modules/login'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
-// const loginStore = loginSystemStore()
-
 const router = useRouter()
-const route = useRoute()
 
-// import { toggleDark } from '@/composables'
 const isDialog = ref(false)
 const childRef = ref()
 
@@ -153,7 +143,7 @@ const deleteFn = async (row: any) => {
     .catch(() => {
       ElMessage({
         type: 'info',
-        message: 'Cancel'
+        message: t('tip.cancelButtonText')
       })
     })
 }
@@ -164,6 +154,8 @@ const editFn = (row: any) => {
   createType.value = 'edit'
   isDialog.value = true
 }
+// 暂存跳转的地址，区别同页面进入补贴的chat页面
+const pathStr = ref('chat1')
 
 // 进入测试页面
 const toPlayground = (row: any) => {
@@ -171,7 +163,7 @@ const toPlayground = (row: any) => {
   let { id } = row
   // userStore.setMenuActive('/chat')
   router.push({
-    name: 'chat',
+    name: pathStr.value,
     query: {
       id
     }
@@ -214,33 +206,10 @@ const dialogTitle = (str: string) => {
     return t('assistant.form.editText')
   }
 }
-const token = ref()
-// 获取地址中的信息实现默认登录
-//http://localhost:5173/assistant?name=wangyu&password=123456
 
-const getLoginFn = async () => {
-  try {
-    let { name, password } = route.query as any as { name: string; password: string }
-    // console.log('name', name)
-    // console.log('password', password)
-
-    sessionStorage.setItem('userName', name)
-    sessionStorage.setItem('password', password)
-    // let res = await loginStore.login({ userName: name, password })
-
-    let res = await loginApi.login({ userName: name, password: password })
-    sessionStorage.setItem('token', res.token)
-    token.value = res.token
-
-    getList()
-  } catch (error) {
-    console.log('error-->', error)
-  }
-}
-getLoginFn()
-// onMounted(() => {
-//   getLoginFn()
-// })
+onMounted(() => {
+  getList()
+})
 </script>
 <style scoped lang="scss">
 .top {
@@ -264,8 +233,14 @@ getLoginFn()
   .top-right {
     display: flex;
     align-items: center;
-    padding-right: 86px;
-    font-size: 16px;
+    padding-right: 15px;
+  }
+  .top-btn {
+    margin-right: 50px;
+    .btn {
+      background: linear-gradient(180deg, #4460dc, #6f89fe);
+      border: none;
+    }
   }
 }
 .tableData-box {
@@ -273,17 +248,6 @@ getLoginFn()
 
   margin: 0 auto;
   border-radius: 10px;
-
-  .top-btn {
-    height: 40px;
-    .btn {
-      float: right;
-      top: 0;
-      right: 20px;
-      background: linear-gradient(180deg, #4460dc, #6f89fe);
-      border: none;
-    }
-  }
   .instructions {
     width: 100%;
     max-height: 80px;

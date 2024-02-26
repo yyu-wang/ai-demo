@@ -13,6 +13,7 @@ const piniaPersistConfig = (key: string, paths?: string[]) => {
     // storage: sessionStorage,
     paths
   }
+
   return persist
 }
 

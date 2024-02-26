@@ -25,15 +25,18 @@ router.beforeEach(async (to, from, next) => {
     // 如果路由不存在，导航到404页面
     next('/404')
   }
-  // 3.判断是访问登陆页，有 Token 就在当前页面，没有 Token 重置路由到登陆页
-  // const token = sessionStorage.getItem('token')
-  // if (to.path.toLocaleLowerCase() === '/login') {
-  //   if (token) return next(from.fullPath)
-  //   return next()
-  // }
+  // console.log('3333333', to.path.toLocaleLowerCase())
+  if (to.path.toLocaleLowerCase() !== '/assistant') {
+    // 3.判断是访问登陆页，有 Token 就在当前页面，没有 Token 重置路由到登陆页
+    const token = sessionStorage.getItem('token')
+    if (to.path.toLocaleLowerCase() === '/login') {
+      if (token) return next(from.fullPath)
+      return next()
+    }
 
-  // // 判断是否有 Token，没有重定向到 login 页面
-  // if (!token) return next({ path: '/login', replace: true })
+    // 判断是否有 Token，没有重定向到 login 页面
+    if (!token) return next({ path: '/login', replace: true })
+  }
 
   // 正常访问页面
   next()

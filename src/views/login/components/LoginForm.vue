@@ -55,12 +55,12 @@ import loginApi from '@/api/login' // 导入封装的 PostApi
 import { ElMessage } from 'element-plus'
 // import { getTimeState } from '@/utils'
 import { useRouter } from 'vue-router'
-import { loginSystemStore } from '@/stores/modules/login'
+// import { loginSystemStore } from '@/stores/modules/login'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
-const loginStore = loginSystemStore()
+// const loginStore = loginSystemStore()
 const router = useRouter()
 type FormInstance = InstanceType<typeof ElForm>
 
@@ -124,7 +124,11 @@ const login = (formEl: FormInstance | undefined) => {
 // 登录
 const submitLogin = async () => {
   try {
-    let res = await loginStore.login(loginForm)
+    // let res = await loginStore.login(loginForm)
+    let res = await loginApi.login(loginForm)
+    console.log('111', res)
+
+    sessionStorage.setItem('token', res.token)
     if ((res as responseType).token) {
       // 4.跳转到首页
       router.push({

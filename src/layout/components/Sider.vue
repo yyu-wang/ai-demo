@@ -1,22 +1,21 @@
 <template>
   <div>
     <div class="logo-box">
-      <div class="img-logo" v-if="!modelValue"></div>
-      <div class="img-icon" v-else></div>
+      <img class="img-logo" v-if="!modelValue" src="../../assets/images/edugpt_logo.png" alt="" />
+      <img class="img-icon" v-else src="../../assets/images/edugpt_browser-icon.png" alt="" />
+      <!-- <div class="img-logo" v-if="!modelValue"></div>
+      <div class="img-icon" v-else></div> -->
     </div>
 
     <el-menu :default-active="userStore.menuActive" :collapse="modelValue">
-      <el-menu-item
-        @click="toRouter(item)"
-        v-for="item in routerList"
-        :index="item.path"
-        :key="item.path"
-      >
-        <el-icon>
-          <component :is="item.meta.icon"></component>
-        </el-icon>
-        <span>{{ item.meta.title }}</span>
-      </el-menu-item>
+      <template v-for="item in routerList" :key="item.path">
+        <el-menu-item @click="toRouter(item)" :index="item.path" v-if="!item.meta.isHide">
+          <el-icon>
+            <component :is="item.meta.icon"></component>
+          </el-icon>
+          <span>{{ setTitle(item.meta) }} </span>
+        </el-menu-item>
+      </template>
     </el-menu>
   </div>
 </template>
@@ -24,6 +23,8 @@
 import { ref, defineProps, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useSystemStore } from '@/stores/modules/system'
+import { useGlobalStore } from '@/stores/modules/global'
+const globalStore = useGlobalStore()
 const userStore = useSystemStore()
 const router = useRouter()
 const route = useRoute()
@@ -34,6 +35,19 @@ defineProps({
   }
 })
 
+// 设置名字
+const setTitle = (meta: any) => {
+  if (globalStore.language === 'en') {
+    return meta.titleEn
+  } else if (globalStore.language === 'zh') {
+    return meta.titleZh
+  } else if (globalStore.language === 'zh-hk') {
+    return meta.titleZhHk
+  } else {
+    return meta.title
+  }
+}
+
 // 跳转路由
 const toRouter = (obj: any) => {
   router.push({
@@ -42,7 +56,7 @@ const toRouter = (obj: any) => {
   setSelect(obj.path)
 }
 const routerList = ref<any[]>()
-
+// 跳轉
 const getRouter = () => {
   const arr = route.matched
   for (let i = 0; i < arr.length; i++) {
@@ -63,6 +77,7 @@ const setSelect = (currentPath: string) => {
     })
   }
 }
+
 // 获取当前所有路由信息
 onMounted(() => {
   getRouter()
@@ -74,15 +89,15 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   .img-logo {
-    max-width: 200px;
-    height: auto;
-    background: url(../assets/images/edugpt_logo.png);
+    width: 200px;
+    height: 50px;
+    // background: url(../../assets/images/edugpt_logo.png);
   }
 
   .img-icon {
-    max-width: 50px;
-    height: auto;
-    background: url(../assets/images/edugpt_browser-icon.png);
+    width: 50px;
+    height: 50px;
+    // background: url(../../assets/images/edugpt_browser-icon.png);
   }
 }
 

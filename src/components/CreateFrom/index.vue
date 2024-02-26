@@ -9,20 +9,20 @@
         label-width="auto"
         label-position="top"
       >
-        <el-form-item label="Name" prop="name">
-          <el-input v-model="formData.name" placeholder="Enter a user friendly name" />
+        <el-form-item :label="t('assistant.form.name')" prop="name">
+          <el-input v-model="formData.name" :placeholder="t('assistant.form.namePlaceholder')" />
         </el-form-item>
-        <el-form-item label="Instructions" prop="instructions">
+        <el-form-item :label="t('assistant.form.instructions')" prop="instructions">
           <el-input
             v-model="formData.instructions"
             type="textarea"
             :autosize="{ minRows: 2, maxRows: 10 }"
-            placeholder="You are a helpful assistant"
+            :placeholder="t('assistant.form.instructionsPlaceholder')"
           />
         </el-form-item>
 
-        <el-form-item label="Model" prop="model">
-          <el-select v-model="formData.model" placeholder="Select">
+        <el-form-item :label="t('assistant.form.model')" prop="model">
+          <el-select v-model="formData.model" :placeholder="t('assistant.form.modelPlaceholder')">
             <el-option
               v-for="(item, index) in modelList"
               :key="index"
@@ -33,7 +33,7 @@
         </el-form-item>
 
         <div class="formTools">
-          <div class="tools">Tools</div>
+          <div class="tools">{{ t('assistant.form.tools') }}</div>
           <!-- <div class="tool-item">
             <div>Functions</div>
             <div>
@@ -41,13 +41,13 @@
             </div>
           </div> -->
           <div class="tool-item">
-            <div>Code interpreter</div>
+            <div>{{ t('assistant.form.codeInterpreter') }}</div>
             <div>
               <el-switch v-model="formData.codeInterpreter" style="--el-switch-on-color: #4460dc" />
             </div>
           </div>
           <div class="tool-item">
-            <div>Retrieval</div>
+            <div>{{ t('assistant.form.retrieval') }}</div>
             <div>
               <el-switch
                 :disabled="isSwitchDisabled"
@@ -57,7 +57,7 @@
             </div>
           </div>
           <div class="tool-item">
-            <div>FILES</div>
+            <div>{{ t('assistant.form.file') }}</div>
             <div>
               <el-upload
                 class="upload-demo"
@@ -70,7 +70,9 @@
                 :limit="3"
                 :on-exceed="handleExceed"
               >
-                <el-button class="tool-add" size="small" text>Add</el-button>
+                <el-button class="tool-add" size="small" text>{{
+                  t('assistant.form.add')
+                }}</el-button>
               </el-upload>
             </div>
           </div>
@@ -100,18 +102,24 @@
       </div>
       <div class="main-btn">
         <!-- <el-button class="btn" @click="revert">Revert</el-button> -->
-        <el-button class="btn" type="primary" :loading="saveLoading" @click="save">Save</el-button>
+        <el-button class="btn" type="primary" :loading="saveLoading" @click="save">{{
+          $t('assistant.form.saveText')
+        }}</el-button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watchEffect, watch, toRefs, reactive, defineEmits, nextTick } from 'vue'
+import { ref, watchEffect, watch, toRefs, defineEmits, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { UploadProps, ElForm } from 'element-plus'
 import { file_url } from '@/config/index'
 import appApi from '@/api/assistant'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 const headers = {
   Authorization: 'Bearer ' + sessionStorage.getItem('token')
 }
@@ -208,11 +216,6 @@ watchEffect(() => {
   }
 })
 
-const fromRules = reactive({
-  name: [{ required: true, message: 'please enter', trigger: 'blur' }],
-  instructions: [{ required: true, message: 'please enter', trigger: 'blur' }],
-  model: [{ required: true, message: 'please select', trigger: 'change' }]
-})
 const isSwitchDisabled = ref(false)
 
 watch(
@@ -328,9 +331,14 @@ const edit = async () => {
     console.log(error)
   }
 }
-
+const fromRules = ref()
 //保存
 const save = () => {
+  fromRules.value = {
+    name: [{ required: true, message: t('assistant.form.blurText'), trigger: 'blur' }],
+    instructions: [{ required: true, message: t('assistant.form.blurText'), trigger: 'blur' }],
+    model: [{ required: true, message: t('assistant.form.blurChange'), trigger: 'change' }]
+  }
   if (!createForm.value) return
   createForm.value.validate(async (valid) => {
     if (!valid) return
@@ -345,6 +353,7 @@ const save = () => {
 interface fileType {
   fileName: string
   path: string
+  id: number
 }
 
 //删除选中的文件

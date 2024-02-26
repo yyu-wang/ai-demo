@@ -20,5 +20,45 @@ export default {
   header: {
     logout: 'Logout',
     personalData: 'Personal Data'
+  },
+  // 基础提示词语
+  tip: {
+    logout: 'Logout?',
+    tip: 'Tip',
+    confirmButtonText: 'Yes',
+    cancelButtonText: 'Cancel',
+    deleteText: 'Are you sure you want to delete?'
+  },
+
+  // 助手
+  assistant: {
+    createText: 'Create',
+    tab: {
+      name: 'Name',
+      instructions: 'Instructions',
+      createdTime: 'Created Time',
+      operate: 'Operate',
+      delete: 'Delete',
+      edit: 'Edit',
+      playground: 'Go to Playground'
+    },
+    form: {
+      createText: 'Create',
+      editText: 'Edit',
+      name: 'Name',
+      namePlaceholder: 'Please enter name',
+      instructions: 'Instructions',
+      instructionsPlaceholder: 'Please enter instructions for the assistant',
+      model: 'Model',
+      modelPlaceholder: 'Please select',
+      tools: 'Tools',
+      codeInterpreter: 'Code Interpreter',
+      retrieval: 'Retrieval',
+      file: 'File',
+      blurText: 'Please enter',
+      blurChange: 'Please select',
+      add: 'add',
+      saveText: 'Save'
+    }
   }
 }

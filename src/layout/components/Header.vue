@@ -17,13 +17,13 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useSystemStore } from '@/stores/modules/system'
+// import { useSystemStore } from '@/stores/modules/system'
 
 import Lunguage from './headerCompopents/Lunguage.vue'
 import Avatar from './headerCompopents/Avatar.vue'
 
 // import { loginSystemStore } from '@/stores/login'
-const userStore = useSystemStore()
+// const userStore = useSystemStore()
 
 defineProps({
   modelValue: {

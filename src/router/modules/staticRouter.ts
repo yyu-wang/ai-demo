@@ -12,7 +12,7 @@ export const staticRouter: RouteRecordRaw[] = [
     name: 'login',
     component: () => import('@/views/login/LoginView.vue'),
     meta: {
-      isHide: true,
+      isHide: false,
       title: 'login'
     }
   },
@@ -21,7 +21,7 @@ export const staticRouter: RouteRecordRaw[] = [
     name: '404',
     component: () => import('@/views/404.vue'),
     meta: {
-      isHide: true,
+      isHide: false,
       title: '404'
     }
   },
@@ -43,11 +43,11 @@ export const staticRouter: RouteRecordRaw[] = [
       },
       {
         path: '/chat',
-        name: 'Playground',
+        name: 'chat',
         component: () => import('@/views/chat/index.vue'),
         meta: {
           isHide: true,
-          title: 'Playground',
+          title: 'chat',
           icon: 'Comment'
         }
       }
@@ -61,23 +61,40 @@ export const staticRouter: RouteRecordRaw[] = [
       {
         path: '/',
         name: 'home',
-        component: () => import('@/views/home/index.vue'),
+        component: () => import('@/views/admin/home/index.vue'),
         meta: {
-          isHide: true,
+          isHide: false,
           title: 'Home',
+          titleEn: 'Home',
+          titleZh: '首页',
+          titleZhHk: '首頁',
           icon: 'HomeFilled'
         }
       },
-      // {
-      //   path: '/assistant',
-      //   name: 'assistant',
-      //   component: () => import('@/views/assistant/index.vue'),
-      //   meta: {
-      //     isHide: true,
-      //     title: 'Assistant',
-      //     icon: 'Tools'
-      //   }
-      // },
+      {
+        path: '/AssistantList',
+        name: 'AssistantList',
+        component: () => import('@/views/admin/assistantCopy/index.vue'),
+        meta: {
+          isHide: false,
+          title: 'Assistant',
+          titleEn: 'Assistant',
+          titleZh: '助手',
+          titleZhHk: '助手',
+          icon: 'Tools'
+        }
+      },
+      {
+        path: '/chat1',
+        name: 'chat1',
+        component: () => import('@/views/admin/assistantCopy/chat.vue'),
+        meta: {
+          isHide: true,
+          title: 'chat1',
+          icon: 'Comment'
+        }
+      },
+
       {
         path: '/overview',
         name: 'overview',

@@ -45,9 +45,12 @@ api.interceptors.response.use(
         sessionStorage.setItem('token', '')
         // token过期
         router.replace('/assistant')
+        reject({
+          message: data.msg
+        })
       } else {
         reject({
-          message: data.message
+          message: data.msg
         })
       }
     })

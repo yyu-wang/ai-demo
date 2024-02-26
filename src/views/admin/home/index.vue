@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <img src="../../assets/images/welcome.png" class="img" />
+    <img src="../../../assets/images/welcome.png" class="img" />
   </div>
 </template>
 <script lang="ts" setup></script>

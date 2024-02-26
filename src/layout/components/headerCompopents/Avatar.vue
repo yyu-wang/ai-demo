@@ -5,7 +5,7 @@
     </div>
     <template #dropdown>
       <el-dropdown-menu>
-        <el-dropdown-item>
+        <el-dropdown-item @click="showUserInfo">
           <el-icon><User /></el-icon>{{ $t('header.personalData') }}
         </el-dropdown-item>
 
@@ -15,23 +15,26 @@
       </el-dropdown-menu>
     </template>
   </el-dropdown>
-  <!-- infoDialog -->
-  <InfoDialog ref="infoRef"></InfoDialog>
-  <!-- passwordDialog -->
-  <PasswordDialog ref="passwordRef"></PasswordDialog>
+  <el-dialog v-model="userVisible" :title="$t('header.personalData')" width="500">
+    <span>{{ $t('login.usernamePlaceholder') }}：{{ userName }}</span>
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const router = useRouter()
-
+const userName = ref<string | null>(sessionStorage.getItem('userName'))
 // 退出
 const logOut = () => {
-  ElMessageBox.confirm('Log out?', 'Tip', {
-    confirmButtonText: 'Yes',
-    cancelButtonText: 'No',
+  ElMessageBox.confirm(t('tip.logout'), t('tip.tip'), {
+    confirmButtonText: t('tip.confirmButtonText'),
+    cancelButtonText: t('tip.cancelButtonText'),
     type: 'warning'
   }).then(() => {
     sessionStorage.removeItem('token')
@@ -39,6 +42,11 @@ const logOut = () => {
       path: '/login'
     })
   })
+}
+// 显示用户信息
+const userVisible = ref<boolean>(false)
+const showUserInfo = () => {
+  userVisible.value = true
 }
 </script>
 
