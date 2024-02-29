@@ -84,8 +84,10 @@
                 }"
                 v-model="msg"
                 :autosize="{ minRows: 4, maxRows: 10 }"
+                :resize="'none'"
                 type="textarea"
                 :placeholder="t('assistant.chat.inputPlaceholder')"
+                @keydown.enter.prevent
                 @keyup.enter="submit"
               />
               <div class="play-btn">

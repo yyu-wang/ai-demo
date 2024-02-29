@@ -42,9 +42,10 @@ api.interceptors.response.use(
       if (data.code === 200) {
         resolve(data)
       } else if (data.code === 401) {
-        localStorage.setItem('token', '')
         // token过期
-        router.replace('/assistant')
+        router.replace('/login')
+        localStorage.setItem('token', '')
+
         reject({
           message: data.msg
         })

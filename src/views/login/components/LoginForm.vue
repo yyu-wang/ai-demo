@@ -122,7 +122,6 @@ const submitLogin = async () => {
     let res = await loginApi.login(loginForm)
 
     localStorage.setItem('userName', loginForm.userName)
-    localStorage.setItem('password', loginForm.password)
     localStorage.setItem('token', res.token)
     if ((res as responseType).token) {
       // 4.跳转到首页
