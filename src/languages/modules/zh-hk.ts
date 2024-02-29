@@ -32,6 +32,7 @@ export default {
 
   // 助手
   assistant: {
+    assistantText: '助手',
     createText: '創建',
     tab: {
       name: '名稱',
@@ -42,6 +43,7 @@ export default {
       edit: '編輯',
       playground: '前往使用'
     },
+    // 表单
     form: {
       createText: '創建',
       editText: '編輯',
@@ -59,6 +61,12 @@ export default {
       blurChange: '請選擇',
       add: '添加',
       saveText: '保存'
+    },
+    // 聊天
+    chat: {
+      createText: '創建新會話',
+      noData: '沒有數據',
+      inputPlaceholder: '輸入您的消息...'
     }
   }
 }

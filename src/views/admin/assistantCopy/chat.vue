@@ -75,7 +75,7 @@
                 </div>
               </div>
             </div>
-            <div class="play-tip" v-if="!msgList.length">How can I help you ？</div>
+            <div class="play-tip" v-if="!msgList.length"></div>
             <div class="play-input-box">
               <el-input
                 :input-style="{
@@ -84,7 +84,7 @@
                 v-model="msg"
                 :autosize="{ minRows: 4, maxRows: 10 }"
                 type="textarea"
-                placeholder="Enter your message..."
+                :placeholder="t('assistant.chat.inputPlaceholder')"
                 @keyup.enter="submit"
               />
               <div class="play-btn">
@@ -104,7 +104,9 @@
       <!-- 会话列表 -->
       <div class="playground-right">
         <div class="playground-right-btn">
-          <el-button type="primary" @click="beforeCreateSession">Create a new session</el-button>
+          <el-button type="primary" @click="beforeCreateSession">{{
+            t('assistant.chat.createText')
+          }}</el-button>
         </div>
 
         <div class="session-box" v-loading="sessionLoading">
@@ -123,7 +125,9 @@
               <el-icon class="session-icon-del"><Delete /></el-icon>
             </div>
           </div>
-          <div style="margin-top: 20px" v-show="sessionList.length <= 0">No Data</div>
+          <div style="margin-top: 20px" v-show="sessionList.length <= 0">
+            {{ t('assistant.chat.noData') }}
+          </div>
         </div>
       </div>
     </div>
@@ -133,7 +137,7 @@
 <script setup lang="ts">
 import { onMounted, ref, nextTick } from 'vue'
 import MarkDownIt from '@/components/MarkDownIt/index.vue'
-import sessionApi from '@/api/session'
+import sessionApi from '@/api/modules/session'
 
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { chat_url } from '@/config/index'
@@ -142,7 +146,7 @@ import { useRoute } from 'vue-router'
 import { setScrollTopFn } from './index'
 import { fetchEventSource } from '@microsoft/fetch-event-source'
 import { Base64 } from 'js-base64'
-import assistantApi from '@/api/assistant'
+import assistantApi from '@/api/modules/assistant'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -155,7 +159,8 @@ interface msgItem {
   message: string
 }
 
-const user = ref<string | null>(sessionStorage.getItem('userName'))
+const user = ref<string | null>(localStorage.getItem('userName'))
+
 // assistant ID
 const assistantId = ref<Number | undefined>()
 // 当前会话id
@@ -239,7 +244,7 @@ const sedMessage = async () => {
     fetchEventSource(chat_url, {
       method: 'POST',
       headers: {
-        Authorization: 'Bearer ' + sessionStorage.getItem('token'),
+        Authorization: 'Bearer ' + localStorage.getItem('token'),
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ threadAppId: threadAppId.value }),
@@ -538,7 +543,6 @@ onMounted(() => {
           font-weight: bold;
 
           .left {
-            margin-left: 50px;
             font-size: 16px;
           }
         }

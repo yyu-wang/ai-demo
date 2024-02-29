@@ -18,7 +18,7 @@
   </el-dialog>
   <!-- 内容 -->
   <div v-loading="!token">
-    <div class="top" v-if="tableData.length">
+    <div class="top">
       <div class="top-title">
         <img class="title-img" src="../../assets/images/edugpt_logo.png" alt="" />
       </div>
@@ -83,8 +83,8 @@
       <div class="create-item" @click="createFn">
         <el-icon size="50" color="#1b9f0a"><OfficeBuilding /></el-icon>
         <div class="item-text">
-          <span>Assistant</span>
-          <span class="sp">Create an assistant</span>
+          <span>{{ t('assistant.assistantText') }}</span>
+          <span class="sp">{{ t('assistant.createText') }} {{ t('assistant.assistantText') }}</span>
         </div>
       </div>
     </div>
@@ -93,24 +93,21 @@
 <script lang="ts" setup>
 import { ref, nextTick } from 'vue'
 import CreateForm from '@/components/CreateFrom/index.vue'
-import assistantApi from '@/api/assistant'
+import assistantApi from '@/api/modules/assistant'
 import { formatTimestamp } from '@/utils'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useRouter, useRoute } from 'vue-router'
-import loginApi from '@/api/login' // 导入封装的 PostApi
+import loginApi from '@/api/modules/login' // 导入封装的 PostApi
 import Lunguage from '@/layout/components/headerCompopents/Lunguage.vue'
 import Avatar from '@/layout/components/headerCompopents/Avatar.vue'
-// import { loginSystemStore } from '@/stores/modules/login'
+
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
-// const loginStore = loginSystemStore()
-
 const router = useRouter()
 const route = useRoute()
 
-// import { toggleDark } from '@/composables'
 const isDialog = ref(false)
 const childRef = ref()
 
@@ -221,15 +218,12 @@ const token = ref()
 const getLoginFn = async () => {
   try {
     let { name, password } = route.query as any as { name: string; password: string }
-    // console.log('name', name)
-    // console.log('password', password)
 
-    sessionStorage.setItem('userName', name)
-    sessionStorage.setItem('password', password)
-    // let res = await loginStore.login({ userName: name, password })
+    localStorage.setItem('userName', name)
+    localStorage.setItem('password', password)
 
     let res = await loginApi.login({ userName: name, password: password })
-    sessionStorage.setItem('token', res.token)
+    localStorage.setItem('token', res.token)
     token.value = res.token
 
     getList()
@@ -254,7 +248,7 @@ getLoginFn()
   font-weight: bold;
 
   .top-title {
-    margin-left: 50px;
+    margin-left: 90px;
     .title-img {
       height: 55px;
       width: auto;
@@ -307,7 +301,7 @@ getLoginFn()
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  // justify-content: center;
   .create-item {
     width: 300px;
     height: 270px;
@@ -316,6 +310,7 @@ getLoginFn()
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-top: 250px;
     padding: 30px 0 0 0;
     .item-text {
       margin-top: 30px;

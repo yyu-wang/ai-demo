@@ -1,4 +1,4 @@
-import request from './index'
+import request from '../index'
 
 class appApi {
   // 创建助手

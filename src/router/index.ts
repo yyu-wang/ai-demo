@@ -25,10 +25,11 @@ router.beforeEach(async (to, from, next) => {
     // 如果路由不存在，导航到404页面
     next('/404')
   }
-  // console.log('3333333', to.path.toLocaleLowerCase())
+
   if (to.path.toLocaleLowerCase() !== '/assistant') {
     // 3.判断是访问登陆页，有 Token 就在当前页面，没有 Token 重置路由到登陆页
-    const token = sessionStorage.getItem('token')
+    const token = localStorage.getItem('token')
+
     if (to.path.toLocaleLowerCase() === '/login') {
       if (token) return next(from.fullPath)
       return next()

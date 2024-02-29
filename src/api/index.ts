@@ -17,7 +17,7 @@ const api = axios.create({
 // 请求拦截器
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token: any = sessionStorage.getItem('token')
+    const token: any = localStorage.getItem('token')
     // 在发送请求之前可以做一些处理
     if (token) {
       config.headers['Authorization'] = 'Bearer ' + token
@@ -42,7 +42,7 @@ api.interceptors.response.use(
       if (data.code === 200) {
         resolve(data)
       } else if (data.code === 401) {
-        sessionStorage.setItem('token', '')
+        localStorage.setItem('token', '')
         // token过期
         router.replace('/assistant')
         reject({

@@ -10,7 +10,7 @@ const piniaPersistConfig = (key: string, paths?: string[]) => {
   const persist: PersistedStateOptions = {
     key,
     storage: localStorage,
-    // storage: sessionStorage,
+    // storage: localStorage,
     paths
   }
 

@@ -1,4 +1,4 @@
-import request from './index'
+import request from '../index'
 // 注册
 class loginApi {
   register(data: any) {

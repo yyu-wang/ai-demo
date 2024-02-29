@@ -5,16 +5,6 @@ export interface GlobalState {
   language: LanguageType
 }
 
-// LoginState
-export interface LoginState {
-  token: string
-}
-export interface ReqLoginForm {
-  userName: string
-  password: string
-  //   rePassword: ''
-}
-
 // SystemStore
 export interface systemState {
   title: string

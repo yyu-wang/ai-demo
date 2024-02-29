@@ -115,13 +115,13 @@ import { ref, watchEffect, watch, toRefs, defineEmits, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { UploadProps, ElForm } from 'element-plus'
 import { file_url } from '@/config/index'
-import appApi from '@/api/assistant'
+import appApi from '@/api/modules/assistant'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
 const headers = {
-  Authorization: 'Bearer ' + sessionStorage.getItem('token')
+  Authorization: 'Bearer ' + localStorage.getItem('token')
 }
 type FormInstance = InstanceType<typeof ElForm>
 const createForm = ref<FormInstance>()
@@ -492,4 +492,3 @@ defineExpose({
   }
 }
 </style>
-@/api/assistant

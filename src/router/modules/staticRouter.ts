@@ -94,28 +94,32 @@ export const staticRouter: RouteRecordRaw[] = [
           icon: 'Comment'
         }
       },
-
       {
         path: '/overview',
         name: 'overview',
         component: () => import('@/views/admin/overview/index.vue'),
         meta: {
           isHide: true,
-          title: 'overview',
+          title: 'Overview',
+          titleEn: 'Overview',
+          titleZh: '综览',
+          titleZhHk: '綜覽',
           icon: 'TrendCharts'
         }
+      },
+      {
+        path: '/classes',
+        name: 'classes',
+        component: () => import('@/views/admin/classes/index.vue'),
+        meta: {
+          isHide: true,
+          title: 'Class Management',
+          titleEn: 'Class Management',
+          titleZh: '班级管理',
+          titleZhHk: '班級管理',
+          icon: 'Memo'
+        }
       }
-
-      // {
-      //   path: '/test',
-      //   name: 'test',
-      //   component: () => import('@/views/test/indexView.vue'),
-      //   meta: {
-      //     isHide: true,
-      //     title: 'test',
-      //     icon: 'Comment'
-      //   }
-      // }
     ]
   }
 ]

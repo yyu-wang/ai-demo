@@ -32,8 +32,10 @@ export default {
     cancelButtonText: '取消',
     deleteText: '你确定要删除吗？'
   },
+
   // 助手
   assistant: {
+    assistantText: '助手',
     createText: '创建',
     tab: {
       name: '名称',
@@ -61,6 +63,12 @@ export default {
       blurChange: '请选择',
       add: '添加',
       saveText: '保存'
+    },
+    // 聊天
+    chat: {
+      createText: '创建新会话',
+      noData: '没有数据',
+      inputPlaceholder: '输入您的消息...'
     }
   }
 }

@@ -18,7 +18,7 @@
   </el-dialog>
   <!-- 内容 -->
   <div>
-    <div class="top" v-if="tableData.length">
+    <div class="top">
       <div class="top-title">
         <!-- <img class="title-img" src="../../assets/images/edugpt_logo.png" alt="" /> -->
       </div>
@@ -31,7 +31,7 @@
       </div>
     </div>
     <!-- 应用列表 -->
-    <div v-show="tableData.length" class="tableData-box">
+    <div class="tableData-box">
       <el-table :data="tableData" border style="width: 100%">
         <el-table-column align="center" prop="name" :label="t('assistant.tab.name')" width="180" />
         <el-table-column
@@ -77,21 +77,12 @@
         </el-table-column>
       </el-table>
     </div>
-    <div class="create-box" v-show="!tableData.length">
-      <div class="create-item" @click="createFn">
-        <el-icon size="50" color="#1b9f0a"><OfficeBuilding /></el-icon>
-        <div class="item-text">
-          <span>Assistant</span>
-          <span class="sp">Create an assistant</span>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 <script lang="ts" setup>
 import { ref, nextTick, onMounted } from 'vue'
 import CreateForm from '@/components/CreateFrom/index.vue'
-import assistantApi from '@/api/assistant'
+import assistantApi from '@/api/modules/assistant'
 import { formatTimestamp } from '@/utils'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useRouter } from 'vue-router'

@@ -29,7 +29,7 @@ import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 
 const router = useRouter()
-const userName = ref<string | null>(sessionStorage.getItem('userName'))
+const userName = ref<string | null>(localStorage.getItem('userName'))
 // 退出
 const logOut = () => {
   ElMessageBox.confirm(t('tip.logout'), t('tip.tip'), {
@@ -37,7 +37,7 @@ const logOut = () => {
     cancelButtonText: t('tip.cancelButtonText'),
     type: 'warning'
   }).then(() => {
-    sessionStorage.removeItem('token')
+    localStorage.removeItem('token')
     router.push({
       path: '/login'
     })

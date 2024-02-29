@@ -1,12 +1,45 @@
 <template>
-  <div></div>
+  <div class="top-box">
+    <div>Overview of</div>
+    <div class="select">
+      <el-select v-model="value" class="m-2" placeholder="Select" size="large" style="width: 240px">
+        <el-option
+          v-for="item in options"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        />
+      </el-select>
+    </div>
+    <div>for</div>
+    <div class="select">
+      <el-select
+        v-model="value1"
+        class="m-2"
+        placeholder="Select"
+        size="large"
+        style="width: 240px"
+      >
+        <el-option
+          v-for="item in options1"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        />
+      </el-select>
+    </div>
+  </div>
   <div class="main">
-    <div id="left" class="box"></div>
-    <div id="right" class="box"></div>
+    <div class="item">
+      <div id="item-top" class="box"></div>
+    </div>
+    <div class="item">
+      <div id="item-bottom" class="box"></div>
+    </div>
   </div>
 </template>
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 // 引入 echarts 核心模块，核心模块提供了 echarts 使用必须要的接口。
 import * as echarts from 'echarts/core'
 // 引入柱状图图表，图表后缀都为 Chart
@@ -17,13 +50,49 @@ import {
   TooltipComponent,
   GridComponent,
   DatasetComponent,
-  TransformComponent
+  TransformComponent,
+  LegendComponent
 } from 'echarts/components'
 // 标签自动布局、全局过渡动画等特性
 import { LabelLayout, UniversalTransition } from 'echarts/features'
 // 引入 Canvas 渲染器，注意引入 CanvasRenderer 或者 SVGRenderer 是必须的一步
 import { CanvasRenderer } from 'echarts/renderers'
 
+const value = ref('Option1')
+const value1 = ref('Option1')
+
+const options = [
+  {
+    value: 'Option1',
+    label: 'past 12 months'
+  },
+  {
+    value: 'Option2',
+    label: 'past 4 weeks'
+  },
+  {
+    value: 'Option3',
+    label: 'past 7 days'
+  },
+  {
+    value: 'Option4',
+    label: 'past 24 hours'
+  }
+]
+const options1 = [
+  {
+    value: 'Option1',
+    label: 'students'
+  },
+  {
+    value: 'Option2',
+    label: 'teachers'
+  },
+  {
+    value: 'Option3',
+    label: 'all users'
+  }
+]
 // 注册必须的组件
 echarts.use([
   TitleComponent,
@@ -35,16 +104,25 @@ echarts.use([
   PieChart,
   LabelLayout,
   UniversalTransition,
-  CanvasRenderer
+  CanvasRenderer,
+  LegendComponent
 ])
 
 // 绘制折线图
 const setLine = () => {
-  let myChart = echarts.init(document.getElementById('left'))
+  let myChart = echarts.init(document.getElementById('item-top'))
 
   // 绘制图表
 
   const option = {
+    title: {
+      text: 'Usage History',
+      left: 'center'
+    },
+    tooltip: {
+      trigger: 'item'
+    },
+
     xAxis: {
       type: 'category',
       data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
@@ -63,14 +141,13 @@ const setLine = () => {
 }
 
 const setPie = () => {
-  let myChart = echarts.init(document.getElementById('right'))
+  let myChart = echarts.init(document.getElementById('item-bottom'))
 
   // 绘制图表
 
   const option = {
     title: {
-      text: 'Referer of a Website',
-      subtext: 'Fake Data',
+      text: 'Usage distrubution',
       left: 'center'
     },
     tooltip: {
@@ -78,19 +155,15 @@ const setPie = () => {
     },
     legend: {
       orient: 'vertical',
-      left: 'left'
+      right: '30%'
     },
     series: [
       {
-        name: 'Access From',
         type: 'pie',
-        radius: '50%',
+        radius: '80%',
         data: [
-          { value: 1048, name: 'Search Engine' },
-          { value: 735, name: 'Direct' },
-          { value: 580, name: 'Email' },
-          { value: 484, name: 'Union Ads' },
-          { value: 300, name: 'Video Ads' }
+          { value: 1048, name: 'image' },
+          { value: 735, name: 'chatbot' }
         ],
         emphasis: {
           itemStyle: {
@@ -110,11 +183,28 @@ onMounted(() => {
 })
 </script>
 <style scoped lang="scss">
+.top-box {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-size: 20px;
+  margin-left: 5%;
+  .select {
+    margin: 0 10px;
+  }
+}
 .main {
   display: flex;
-  .box {
-    width: 40%;
+  flex-direction: column;
+  margin-top: 20px;
+  align-items: center;
+  .item {
+    width: 90%;
     height: 400px;
+    .box {
+      width: 100%;
+      height: 100%;
+    }
   }
 }
 </style>

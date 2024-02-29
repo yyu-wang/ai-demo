@@ -32,6 +32,7 @@ export default {
 
   // 助手
   assistant: {
+    assistantText: 'Assistant',
     createText: 'Create',
     tab: {
       name: 'Name',
@@ -59,6 +60,11 @@ export default {
       blurChange: 'Please select',
       add: 'add',
       saveText: 'Save'
+    },
+    chat: {
+      createText: 'Create New Chat',
+      noData: 'No data',
+      inputPlaceholder: 'Enter your message...'
     }
   }
 }

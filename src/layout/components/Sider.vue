@@ -37,11 +37,11 @@ defineProps({
 
 // 设置名字
 const setTitle = (meta: any) => {
-  if (globalStore.language === 'en') {
+  if (globalStore.language === 'en' && meta.titleEn) {
     return meta.titleEn
-  } else if (globalStore.language === 'zh') {
+  } else if (globalStore.language === 'zh' && meta.titleZh) {
     return meta.titleZh
-  } else if (globalStore.language === 'zh-hk') {
+  } else if (globalStore.language === 'zh-hk' && meta.titleZhHk) {
     return meta.titleZhHk
   } else {
     return meta.title

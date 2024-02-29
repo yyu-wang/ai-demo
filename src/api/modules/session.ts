@@ -1,4 +1,4 @@
-import request from './index'
+import request from '../index'
 
 class sessionApi {
   // 创建会话
