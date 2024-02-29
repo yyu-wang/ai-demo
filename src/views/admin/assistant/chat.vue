@@ -14,68 +14,69 @@
       </div>
     </div>
     <div class="playground">
-      <div class="playground-left" v-loading="messageLoading">
+      <div class="playground-left">
         <div class="right-main">
-          <div class="p-top">
-            <div class="left">THREAD</div>
-            <div class="right">
-              <!-- <el-button type="danger" plain size="small" @click="clearFn">清除</el-button> -->
-            </div>
-          </div>
+          <div class="title">THREAD</div>
           <!-- 聊天模块 -->
           <div class="chat-box">
-            <div class="play-main" ref="chatRef" v-if="msgList.length">
-              <div class="item-box" v-for="(item, index) in msgList" :key="index">
-                <div style="margin-top: 10px">
-                  <div class="type-box">
-                    <div class="type-icon icon1">
-                      <el-icon size="30"><UserFilled /></el-icon>
+            <div class="play-box" ref="chatRef" v-loading="messageLoading">
+              <div class="play-main" v-if="msgList.length">
+                <div class="item-box" v-for="(item, index) in msgList" :key="index">
+                  <div style="margin-top: 10px">
+                    <div class="type-box">
+                      <div class="type-icon icon1">
+                        <el-icon size="30"><UserFilled /></el-icon>
+                      </div>
+
+                      <div class="type1">{{ user }}</div>
                     </div>
 
-                    <div class="type1">{{ user }}</div>
-                  </div>
-
-                  <div class="item-content">
-                    <MarkDownIt v-model="item.message" />
-                  </div>
-                </div>
-                <div style="margin-top: 10px">
-                  <div class="type-box">
-                    <div class="type-icon icon2">
-                      <svg
-                        aria-hidden="true"
-                        focusable="false"
-                        data-prefix="fas"
-                        data-icon="robot"
-                        class="svg-inline--fa fa-robot fa-2x w-20 h-20 m-auto"
-                        role="img"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 640 512"
-                      >
-                        <path
-                          fill="currentColor"
-                          d="M320 0c17.7 0 32 14.3 32 32V96H472c39.8 0 72 32.2 72 72V440c0 39.8-32.2 72-72 72H168c-39.8 0-72-32.2-72-72V168c0-39.8 32.2-72 72-72H288V32c0-17.7 14.3-32 32-32zM208 384c-8.8 0-16 7.2-16 16s7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H208zm96 0c-8.8 0-16 7.2-16 16s7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H304zm96 0c-8.8 0-16 7.2-16 16s7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H400zM264 256a40 40 0 1 0 -80 0 40 40 0 1 0 80 0zm152 40a40 40 0 1 0 0-80 40 40 0 1 0 0 80zM48 224H64V416H48c-26.5 0-48-21.5-48-48V272c0-26.5 21.5-48 48-48zm544 0c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H576V224h16z"
-                        ></path>
-                      </svg>
+                    <div class="item-content">
+                      <MarkDownIt v-model="item.message" />
                     </div>
-                    <div class="type2">EduGPT</div>
                   </div>
-
-                  <div class="item-content">
-                    <div v-if="item.result">
-                      <MarkDownIt v-model="item.result" />
-                      <el-button v-if="isSenMsg" type="primary" size="small" @click="Retry"
-                        >Retry</el-button
-                      >
+                  <div style="margin-top: 10px">
+                    <div class="type-box">
+                      <div class="type-icon icon2">
+                        <svg
+                          aria-hidden="true"
+                          focusable="false"
+                          data-prefix="fas"
+                          data-icon="robot"
+                          class="svg-inline--fa fa-robot fa-2x w-20 h-20 m-auto"
+                          role="img"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 640 512"
+                        >
+                          <path
+                            fill="currentColor"
+                            d="M320 0c17.7 0 32 14.3 32 32V96H472c39.8 0 72 32.2 72 72V440c0 39.8-32.2 72-72 72H168c-39.8 0-72-32.2-72-72V168c0-39.8 32.2-72 72-72H288V32c0-17.7 14.3-32 32-32zM208 384c-8.8 0-16 7.2-16 16s7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H208zm96 0c-8.8 0-16 7.2-16 16s7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H304zm96 0c-8.8 0-16 7.2-16 16s7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H400zM264 256a40 40 0 1 0 -80 0 40 40 0 1 0 80 0zm152 40a40 40 0 1 0 0-80 40 40 0 1 0 0 80zM48 224H64V416H48c-26.5 0-48-21.5-48-48V272c0-26.5 21.5-48 48-48zm544 0c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H576V224h16z"
+                          ></path>
+                        </svg>
+                      </div>
+                      <div class="type2">EduGPT</div>
                     </div>
-                    <div v-else>
-                      <el-button type="success" text loading></el-button>
+
+                    <div class="item-content">
+                      <div v-if="item.result">
+                        <MarkDownIt v-model="item.result" />
+                        <el-button
+                          v-if="isSenMsg && index === msgList.length - 1"
+                          type="primary"
+                          size="small"
+                          @click="Retry"
+                          >{{ t('assistant.chat.retry') }}</el-button
+                        >
+                      </div>
+                      <div v-else>
+                        <el-button type="success" text loading></el-button>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="play-tip" v-if="!msgList.length"></div>
+            <!-- 输入框 -->
             <div class="play-input-box">
               <el-input
                 :input-style="{
@@ -179,7 +180,7 @@ const messageLoading = ref(false)
 // 消息队列
 const msgList = ref<msgItem[]>([])
 // 消息输入框
-const msg = ref()
+const msg = ref<string>('')
 // 暂时存的会话消息
 const stagingMsg = ref()
 // 是否发送消息失败
@@ -198,8 +199,9 @@ interface sessionItem {
 const submit = () => {
   if (assistantId.value) {
     //判断是否是当前助手id
-    if (msg.value) {
-      stagingMsg.value = msg.value
+    let trimMsg = msg.value.trim()
+    if (trimMsg) {
+      stagingMsg.value = trimMsg
       //判断当前消息框是否输入了消息
       let obj = {
         message: msg.value,
@@ -218,7 +220,11 @@ const submit = () => {
       } else {
         sedMessage()
       }
-      // 清除输入框的内容
+    } else {
+      ElMessage({
+        message: t('assistant.chat.inputPlaceholder'),
+        type: 'error'
+      })
     }
   } else {
     ElMessage({
@@ -281,8 +287,6 @@ const sedMessage = async () => {
   }
 
   try {
-    console.log('stagingMsg.value', stagingMsg.value)
-
     // 发送消息
     await sessionApi.sendSession({
       assistantId: assistantId.value, //当前助手的id
@@ -454,267 +458,5 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.content {
-  display: flex;
-  flex-direction: row;
-  height: 100%;
-  background: $bg-color;
-
-  .table-list {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 400px;
-    height: 100%;
-
-    .title {
-      height: 20px;
-      text-align: center;
-      display: flex;
-      align-items: center;
-      font-size: 30px;
-      font-weight: bold;
-      .title-img {
-        height: 55px;
-        width: auto;
-        background-size: auto;
-        cursor: pointer;
-      }
-    }
-    .table-item-box {
-      background: #ffffff;
-      width: 360px;
-      height: calc(100% - 70px);
-      border-radius: 10px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-
-      .table-item {
-        background: $bg-color;
-        width: 90%;
-        padding: 10px 0;
-        text-align: center;
-        margin-top: 10px;
-        font-size: 14px;
-        border-radius: 10px;
-        cursor: pointer;
-      }
-      .table-item-a {
-        background: $bg-color;
-        color: #000;
-      }
-      .table-item-b {
-        background: $basic-color;
-        color: #ffffff;
-      }
-      .table-item:hover {
-        background: $basic-color;
-        color: #ffffff;
-      }
-    }
-  }
-  .playground {
-    width: calc(100% - 400px);
-    height: 100%;
-    display: flex;
-    flex-direction: row;
-
-    .playground-left {
-      width: calc(100% - 300px);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-
-      .right-main {
-        margin: 0 auto;
-        width: 70%;
-        height: calc(100% - 50px);
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-
-        .p-top {
-          width: 100%;
-          display: flex;
-          justify-content: space-between;
-          padding: 20px 0;
-          font-weight: bold;
-
-          .left {
-            font-size: 16px;
-          }
-        }
-        .chat-box {
-          flex: 1;
-          width: 100%;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          .play-main {
-            margin: 0 auto;
-            padding-bottom: 20px;
-            width: 100%;
-            flex-wrap: wrap;
-            height: 660px;
-            overflow-y: auto;
-            background: #ffffff;
-            border-radius: 10px;
-            padding: 10px;
-
-            .item-box {
-              display: flex;
-              flex-direction: column;
-              margin: 0 10px;
-              .type-box {
-                display: flex;
-                align-items: center;
-                .type-icon {
-                  width: 30px;
-                  height: 30px;
-
-                  margin-right: 10px;
-                }
-                .icon1 {
-                  color: $font-color;
-                }
-                .icon2 {
-                  color: rgb(255, 0, 138);
-                }
-                .type1 {
-                  font-size: 16px;
-                  font-weight: bold;
-                  color: $font-color;
-                }
-                .type2 {
-                  font-size: 16px;
-                  font-weight: bold;
-                  color: rgb(255, 0, 138);
-                }
-              }
-
-              .item-content {
-                font-size: 14px;
-                color: #333333;
-                background: $bg-color;
-                border-radius: 6px;
-                .chat-content-text {
-                  font-size: 14px;
-                  color: #676767;
-                }
-              }
-            }
-          }
-          .play-tip {
-            margin: 0 auto;
-            padding-bottom: 20px;
-            width: 100%;
-            height: 600px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 30px;
-          }
-          .play-input-box {
-            width: calc(100% + 20px);
-            margin: 0 auto;
-            position: relative;
-            // padding: 10px;
-            .play-btn {
-              width: 50px;
-              position: absolute;
-              right: 20px;
-              top: calc(50% - 20px);
-              display: flex;
-              align-items: center;
-              justify-content: space-between;
-            }
-          }
-        }
-      }
-    }
-
-    .playground-right {
-      width: 400px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 0 20px;
-      .playground-right-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 100px;
-      }
-      .session-box {
-        width: 360px;
-        height: calc(100vh - 230px);
-        display: flex;
-        align-items: center;
-        flex-direction: column;
-        overflow: auto;
-        background: #ffffff;
-        border-radius: 10px;
-
-        .session-item {
-          width: calc(90% - 20px);
-          padding: 0 10px;
-          display: flex;
-          justify-content: space-between;
-          font-size: 15px;
-          cursor: pointer;
-          border-radius: 10px;
-          margin-top: 10px;
-          .session-text {
-            flex: 1;
-            height: 30px;
-            padding-top: 10px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-          }
-          .session-icon-del {
-            width: 40px;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          }
-        }
-        .session-item-1 {
-          background-color: $basic-color;
-          color: #ffffff;
-        }
-        .session-item-2 {
-          background: $bg-color;
-          color: #222222;
-        }
-      }
-
-      .session-item:hover {
-        background-color: $basic-color;
-        color: #ffffff;
-      }
-    }
-  }
-}
-
-/* 当视口宽度小于1200px时，隐藏左边的内容表单 */
-@media screen and (max-width: 1200px) {
-  .table-list {
-    display: none !important;
-  }
-  .playground {
-    width: 100% !important;
-  }
-}
-@media screen and (max-width: 800px) {
-  .playground-left {
-    width: 100% !important;
-  }
-  .playground-right {
-    display: none !important;
-  }
-}
+@import './chat.scss';
 </style>

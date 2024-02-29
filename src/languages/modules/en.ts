@@ -64,6 +64,7 @@ export default {
     chat: {
       createText: 'Create New Chat',
       noData: 'No data',
+      retry: 'Retry',
       inputPlaceholder: 'Enter your message...'
     }
   }

@@ -66,6 +66,7 @@ export default {
     chat: {
       createText: '創建新會話',
       noData: '沒有數據',
+      retry: '重試',
       inputPlaceholder: '輸入您的消息...'
     }
   }

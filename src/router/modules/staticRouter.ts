@@ -4,7 +4,6 @@
 import { RouteRecordRaw } from 'vue-router'
 
 import Layout from '@/layout/index.vue'
-import AssistantLayout from '@/layout/assistant.vue'
 
 export const staticRouter: RouteRecordRaw[] = [
   {
@@ -25,34 +24,7 @@ export const staticRouter: RouteRecordRaw[] = [
       title: '404'
     }
   },
-  //   助手模块抽离
-  {
-    path: '/AssistantLayout',
-    name: 'assistantLayout',
-    component: AssistantLayout,
-    children: [
-      {
-        path: '/assistant',
-        name: 'assistant',
-        component: () => import('@/views/assistant/index.vue'),
-        meta: {
-          isHide: true,
-          title: 'Assistant',
-          icon: 'Tools'
-        }
-      },
-      {
-        path: '/chat',
-        name: 'chat',
-        component: () => import('@/views/chat/index.vue'),
-        meta: {
-          isHide: true,
-          title: 'chat',
-          icon: 'Comment'
-        }
-      }
-    ]
-  },
+
   {
     path: '/layout',
     name: 'layout',
@@ -72,9 +44,9 @@ export const staticRouter: RouteRecordRaw[] = [
         }
       },
       {
-        path: '/AssistantList',
-        name: 'AssistantList',
-        component: () => import('@/views/admin/assistantCopy/index.vue'),
+        path: '/assistant',
+        name: 'assistant',
+        component: () => import('@/views/admin/assistant/index.vue'),
         meta: {
           isHide: false,
           title: 'Assistant',
@@ -87,7 +59,7 @@ export const staticRouter: RouteRecordRaw[] = [
       {
         path: '/chat1',
         name: 'chat1',
-        component: () => import('@/views/admin/assistantCopy/chat.vue'),
+        component: () => import('@/views/admin/assistant/chat.vue'),
         meta: {
           isHide: true,
           title: 'chat1',

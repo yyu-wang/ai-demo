@@ -67,6 +67,7 @@ export default {
     // 聊天
     chat: {
       createText: '创建新会话',
+      retry: '重试',
       noData: '没有数据',
       inputPlaceholder: '输入您的消息...'
     }
