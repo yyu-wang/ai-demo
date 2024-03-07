@@ -1,12 +1,7 @@
 <template>
   <el-form ref="loginFormRef" :model="loginForm" :rules="loginRules" size="large">
     <el-form-item prop="userName">
-      <el-input
-        v-model="loginForm.userName"
-        :placeholder="$t('login.usernamePlaceholder')"
-        @keyup.enter="login(loginFormRef)"
-      >
-      </el-input>
+      <el-input v-model="loginForm.userName" :placeholder="$t('login.usernamePlaceholder')" @keyup.enter="login(loginFormRef)"> </el-input>
     </el-form-item>
     <el-form-item prop="password">
       <el-input
@@ -38,7 +33,7 @@
   </div>
   <div class="text">
     {{ isLogin ? $t('login.promptTextOne') : $t('login.promptTextTwo') }}
-    <el-button @click="registerFn" type="success" link>
+    <el-button class="linkBtn" @click="registerFn" type="success" link :loading="loading">
       {{ isLogin ? $t('login.registerButton') : $t('login.loginButton') }}</el-button
     >
   </div>
@@ -47,7 +42,7 @@
 <script setup lang="ts">
 import { ElForm } from 'element-plus'
 import { reactive, ref } from 'vue'
-
+import { Login } from '@/api/interfaces/login'
 import loginApi from '@/api/modules/login' // 导入封装的 PostApi
 import { ElMessage } from 'element-plus'
 // import { getTimeState } from '@/utils'
@@ -59,15 +54,9 @@ const { t } = useI18n()
 const router = useRouter()
 type FormInstance = InstanceType<typeof ElForm>
 
-interface ReqLoginForm {
-  userName: string
-  password: string
-  rePassword: string
-}
-
 const loginFormRef = ref<FormInstance>()
 
-const loginForm = reactive<ReqLoginForm>({
+const loginForm = reactive<Login.ReqLoginForm>({
   userName: '',
   password: '',
   rePassword: ''
@@ -86,13 +75,6 @@ const getLoginI18nSetRules = () => {
   }
 }
 
-interface responseType {
-  token?: string
-  code?: number
-  expire?: number
-  message?: string
-  // 其他可能的属性
-}
 const isLogin = ref(true)
 // 登录
 const login = (formEl: FormInstance | undefined) => {
@@ -110,7 +92,7 @@ const login = (formEl: FormInstance | undefined) => {
         submitLogin()
       }
       // 1.执行登录接口
-    } finally {
+    } catch {
       loading.value = false
     }
   })
@@ -123,7 +105,7 @@ const submitLogin = async () => {
 
     localStorage.setItem('userName', loginForm.userName)
     localStorage.setItem('token', res.token)
-    if ((res as responseType).token) {
+    if (res.token) {
       // 4.跳转到首页
       router.push({
         path: '/'
@@ -135,7 +117,9 @@ const submitLogin = async () => {
       //   duration: 3000
       // })
     }
+    loading.value = false
   } catch (error: any) {
+    loading.value = false
     ElMessage({
       message: error.message,
       type: 'error'
@@ -144,12 +128,22 @@ const submitLogin = async () => {
 }
 // 注册
 const submitRegister = async (formEl: FormInstance | undefined) => {
-  await loginApi.register(loginForm)
-  ElMessage({
-    message: 'Register successful',
-    type: 'success'
-  })
-  resetForm(formEl)
+  try {
+    await loginApi.register(loginForm)
+
+    ElMessage({
+      message: 'Register successful',
+      type: 'success'
+    })
+    loading.value = false
+    resetForm(formEl)
+  } catch (error: any) {
+    loading.value = false
+    ElMessage({
+      message: error.message,
+      type: 'error'
+    })
+  }
 }
 // 切换注册登录
 const registerFn = () => {
@@ -185,5 +179,8 @@ const resetForm = (formEl: FormInstance | undefined) => {
   justify-content: center;
   padding-top: 50px;
   align-items: center;
+  .linkBtn {
+    line-height: normal;
+  }
 }
 </style>

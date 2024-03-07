@@ -1,39 +1,51 @@
 <template>
   <div>
-    <div class="logo-box">
-      <img class="img-logo" v-if="!modelValue" src="../../assets/images/edugpt_logo.png" alt="" />
-      <img class="img-icon" v-else src="../../assets/images/edugpt_browser-icon.png" alt="" />
-      <!-- <div class="img-logo" v-if="!modelValue"></div>
-      <div class="img-icon" v-else></div> -->
-    </div>
-
-    <el-menu :default-active="userStore.menuActive" :collapse="modelValue">
+    <el-menu :default-active="userStore.menuActive" :collapse="isCollapse">
       <template v-for="item in routerList" :key="item.path">
-        <el-menu-item @click="toRouter(item)" :index="item.path" v-if="!item.meta.isHide">
-          <el-icon>
-            <component :is="item.meta.icon"></component>
-          </el-icon>
-          <span>{{ setTitle(item.meta) }} </span>
-        </el-menu-item>
+        <template v-if="item.children && item.children.length > 0">
+          <el-sub-menu :index="item.path">
+            <template #title>
+              <el-icon>
+                <component :is="item.meta.icon"></component>
+              </el-icon>
+              <span>{{ setTitle(item.meta) }} </span>
+            </template>
+            <el-menu-item-group>
+              <template v-for="jtem in item.children" :key="jtem.path">
+                <el-menu-item @click="toRouter(jtem)" :index="jtem.path" v-if="!jtem.meta.isHide">
+                  <el-icon>
+                    <component :is="jtem.meta.icon"></component>
+                  </el-icon>
+                  <span>{{ setTitle(jtem.meta) }} </span>
+                </el-menu-item>
+              </template>
+            </el-menu-item-group>
+          </el-sub-menu>
+        </template>
+        <template v-else>
+          <el-menu-item @click="toRouter(item)" :index="item.path" v-if="!item.meta.isHide">
+            <el-icon>
+              <component :is="item.meta.icon"></component>
+            </el-icon>
+            <span>{{ setTitle(item.meta) }} </span>
+          </el-menu-item>
+        </template>
       </template>
     </el-menu>
   </div>
 </template>
 <script setup lang="ts">
-import { ref, defineProps, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useSystemStore } from '@/stores/modules/system'
 import { useGlobalStore } from '@/stores/modules/global'
+import { storeToRefs } from 'pinia'
 const globalStore = useGlobalStore()
+const { isCollapse } = storeToRefs(globalStore)
+
 const userStore = useSystemStore()
 const router = useRouter()
 const route = useRoute()
-defineProps({
-  modelValue: {
-    type: Boolean,
-    default: false
-  }
-})
 
 // 设置名字
 const setTitle = (meta: any) => {
@@ -56,7 +68,7 @@ const toRouter = (obj: any) => {
   setSelect(obj.path)
 }
 const routerList = ref<any[]>()
-// 跳轉
+//
 const getRouter = () => {
   const arr = route.matched
   for (let i = 0; i < arr.length; i++) {
@@ -83,34 +95,18 @@ onMounted(() => {
   getRouter()
 })
 </script>
-<style lang="scss" scoped>
-.logo-box {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  .img-logo {
-    width: 200px;
-    height: 50px;
-    // background: url(../../assets/images/edugpt_logo.png);
-  }
 
-  .img-icon {
-    width: 50px;
-    height: 50px;
-    // background: url(../../assets/images/edugpt_browser-icon.png);
-  }
-}
-
+<style scoped lang="scss">
 .el-menu {
   border-right: none;
   background-color: $bg-color;
 }
 .el-menu-item.is-active {
   color: #ffffff;
-  background-color: $basic-color;
+  background-color: $menu-color;
 }
 .el-menu-item:hover {
-  background-color: $basic-color;
-  color: #ffffff;
+  background-color: $menu-hover-color;
+  color: #000000;
 }
 </style>

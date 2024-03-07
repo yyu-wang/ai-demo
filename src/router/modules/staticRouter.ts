@@ -2,8 +2,7 @@
  * staticRouter (静态路由)
  */
 import { RouteRecordRaw } from 'vue-router'
-
-import Layout from '@/layout/index.vue'
+import Layout from '@/layout/admin/index.vue'
 
 export const staticRouter: RouteRecordRaw[] = [
   {
@@ -24,7 +23,6 @@ export const staticRouter: RouteRecordRaw[] = [
       title: '404'
     }
   },
-
   {
     path: '/layout',
     name: 'layout',
@@ -46,7 +44,7 @@ export const staticRouter: RouteRecordRaw[] = [
       {
         path: '/assistant',
         name: 'assistant',
-        component: () => import('@/views/admin/assistant/index.vue'),
+        component: () => import('@/views/assistant/index.vue'),
         meta: {
           isHide: false,
           title: 'Assistant',
@@ -57,13 +55,26 @@ export const staticRouter: RouteRecordRaw[] = [
         }
       },
       {
-        path: '/chat1',
-        name: 'chat1',
-        component: () => import('@/views/admin/assistant/chat.vue'),
+        path: '/chat',
+        name: 'chat',
+        component: () => import('@/views/assistant/chat.vue'),
         meta: {
           isHide: true,
-          title: 'chat1',
+          title: 'chat',
           icon: 'Comment'
+        }
+      },
+      {
+        path: '/draw',
+        name: 'draw',
+        component: () => import('@/views/draw/index.vue'),
+        meta: {
+          isHide: false,
+          title: 'Draw',
+          titleEn: 'Draw',
+          titleZh: '画图',
+          titleZhHk: '畫圖',
+          icon: 'Picture'
         }
       },
       {
@@ -89,6 +100,19 @@ export const staticRouter: RouteRecordRaw[] = [
           titleEn: 'Class Management',
           titleZh: '班级管理',
           titleZhHk: '班級管理',
+          icon: 'Memo'
+        }
+      },
+      {
+        path: '/menu',
+        name: 'menu',
+        component: () => import('@/views/admin/menu/menu.vue'),
+        meta: {
+          isHide: false,
+          title: 'Menu',
+          titleEn: 'Menu',
+          titleZh: '菜单管理',
+          titleZhHk: '菜單管理',
           icon: 'Memo'
         }
       }

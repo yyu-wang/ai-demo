@@ -11,7 +11,11 @@ export const useGlobalStore = defineStore({
   // 修改默认值之后，需清除 localStorage 数据
   state: (): GlobalState => ({
     // 当前系统语言
-    language: null
+    language: null,
+    // 折叠菜单
+    isCollapse: false,
+    // 页脚
+    footer: true
   }),
   getters: {},
   actions: {

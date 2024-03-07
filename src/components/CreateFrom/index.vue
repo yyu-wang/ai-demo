@@ -265,7 +265,6 @@ const createEditFn = () => {
   fileList.value.forEach((item) => {
     fileIds.push((item as any).fileId)
   })
-  console.log('fileIds', fileIds)
 
   let obj = {
     name,

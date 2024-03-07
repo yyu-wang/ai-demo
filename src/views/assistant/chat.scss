@@ -3,6 +3,7 @@
     flex-direction: row;
     height: 100%;
     background: $bg-color;
+    border-radius: 10px;
 
     .table-list {
         display: flex;
@@ -92,7 +93,7 @@
                     border-radius: 10px;
                     .play-box {
                         width: 100%;
-                        height: 88%;
+                        height: 87%;
                         overflow-y: auto;
                         background: #ffffff;
                         border-radius: 10px;
@@ -151,6 +152,9 @@
                         width: 100%;
                         margin: 0 auto;
                         position: relative;
+                        :deep(.el-textarea__inner) {
+                            border-radius: 10px;
+                        }
                         .play-btn {
                             width: 50px;
                             position: absolute;

@@ -1,11 +1,11 @@
 // api.ts
 
-import axios, { AxiosResponse, InternalAxiosRequestConfig } from 'axios'
+import axios, { AxiosResponse, InternalAxiosRequestConfig, AxiosError } from 'axios'
 import router from '@/router/index'
 
-export interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
-  loading?: boolean
-  cancel?: boolean
+export interface ApiResponse {
+  code: number
+  message: string
 }
 
 // 创建 Axios 实例
@@ -25,7 +25,7 @@ api.interceptors.request.use(
 
     return config
   },
-  (error) => {
+  (error: AxiosError) => {
     // 对请求错误进行处理
     return Promise.reject(error)
   }
@@ -47,16 +47,16 @@ api.interceptors.response.use(
         localStorage.setItem('token', '')
 
         reject({
-          message: data.msg
+          message: data.message
         })
       } else {
         reject({
-          message: data.msg
+          message: data.message
         })
       }
     })
   },
-  (error) => {
+  (error: AxiosError) => {
     // 对响应错误进行处理
     return Promise.reject(error)
   }

@@ -1,7 +1,9 @@
-import request from '../index'
+import request, { ApiResponse } from '../index'
+import { Login, loginRes } from '../interfaces/login'
+
 // 注册
 class loginApi {
-  register(data: any) {
+  register(data: Login.ReqLoginForm): Promise<ApiResponse> {
     return request({
       url: '/auth/user/register',
       data,
@@ -9,7 +11,7 @@ class loginApi {
     })
   }
   // 登录
-  login(data: any) {
+  login(data: Login.LoginForm): Promise<loginRes.loginType> {
     return request({
       url: '/auth/user/login',
       method: 'POST',

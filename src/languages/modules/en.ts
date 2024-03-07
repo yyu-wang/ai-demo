@@ -27,7 +27,8 @@ export default {
     tip: 'Tip',
     confirmButtonText: 'Yes',
     cancelButtonText: 'Cancel',
-    deleteText: 'Are you sure you want to delete?'
+    deleteText: 'Are you sure you want to delete?',
+    inputText: 'Please enter '
   },
 
   // 助手
@@ -67,5 +68,71 @@ export default {
       retry: 'Retry',
       inputPlaceholder: 'Enter your message...'
     }
+  },
+  // 画图
+  draw: {
+    model: 'Model',
+    pictureStyle: 'Picture Style',
+    pictureQuality: 'Picture Quality',
+    pictureSize: 'Picture Size',
+    pictureType: 'Picture Type',
+    mainColors: 'Main Colors',
+    describe: 'Describe',
+    Preview: 'Preview',
+    generate: 'Generate',
+    vivid: 'Vivid',
+    natural: 'Natural',
+    standard: 'Standard',
+    hd: 'HD',
+    describeInfo: 'Please fill in the description of the image to be generated...',
+    imageText: 'Your AI-generated image will be displayed here...',
+    typeText1: ';Adoption ',
+    typeText2: 'Style ',
+    type: {
+      default: 'Default',
+      cartoon: 'Cartoon',
+      comic: 'Comic',
+      animation: 'Animation',
+      line: 'Line',
+      abstract: 'Abstract',
+      impression: 'Impression',
+      minimalism: 'Minimalism',
+      handDrawn: 'Hand-drawn',
+      classical: 'Classical',
+      oilPainting: 'OilPainting',
+      watercolor: 'Watercolor',
+      ukiyoE: 'ukiyo-e',
+      realistic: 'Realistic',
+      pixel: 'Pixel'
+    },
+    colorText: ';The main color is:',
+    color: {
+      default: 'Default',
+      red: 'Red',
+      blue: 'Blue',
+      green: 'Green',
+      yellow: 'Yellow',
+      purple: 'Purple',
+      orange: 'Orange',
+      pink: 'Pink',
+      gray: 'Gray',
+      black: 'Black',
+      white: 'White'
+    }
+  },
+  // 表格
+  table: {
+    notData: 'notData',
+    columnSetting: 'Column Setting',
+    columnName: 'Column Name',
+    show: 'Show',
+    sort: 'Sort'
+  },
+  // 搜索
+  searchForm: {
+    search: 'Search',
+    reset: 'Reset',
+    expand: 'Expand',
+    close: 'Close'
   }
 }

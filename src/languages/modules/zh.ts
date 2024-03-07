@@ -30,7 +30,8 @@ export default {
     tip: '提示',
     confirmButtonText: '是的',
     cancelButtonText: '取消',
-    deleteText: '你确定要删除吗？'
+    deleteText: '你确定要删除吗？',
+    inputText: '请输入'
   },
 
   // 助手
@@ -71,5 +72,73 @@ export default {
       noData: '没有数据',
       inputPlaceholder: '输入您的消息...'
     }
+  },
+
+  // 画图
+  draw: {
+    model: '模型',
+    pictureStyle: '图片风格',
+    pictureQuality: '图片质量',
+    pictureSize: '图片大小',
+    pictureType: '图片类型',
+    mainColors: '主要颜色',
+    describe: '描述',
+    Preview: '预览',
+    generate: '生成',
+    vivid: '鲜艳',
+    natural: '自然',
+    standard: '标准',
+    hd: '高清',
+    describeInfo: '请填写需要生成的图片描述...',
+    imageText: '您的AI生成的图片将显示在这里...',
+    typeText1: ';采用',
+    typeText2: '风格',
+    type: {
+      default: '默认',
+      cartoon: '卡通',
+      comic: '漫画',
+      animation: '动漫',
+      line: '线条',
+      abstract: '抽象',
+      impression: '印象',
+      minimalism: '极简',
+      handDrawn: '手绘',
+      classical: '古典',
+      oilPainting: '油画',
+      watercolor: '水彩',
+      ukiyoE: '浮世绘',
+      realistic: '写实',
+      pixel: '像素'
+    },
+    colorText: ';主要颜色为：',
+    color: {
+      default: '默认',
+      red: '红色',
+      blue: '蓝色',
+      green: '绿色',
+      yellow: '黄色',
+      purple: '紫色',
+      orange: '橙色',
+      pink: '粉红色',
+      gray: '灰色',
+      black: '黑色',
+      white: '白色'
+    }
+  },
+
+  // 表格
+  table: {
+    notData: '没有数据',
+    columnSetting: '列设置',
+    columnName: '列名',
+    show: '显示',
+    sort: '排序'
+  },
+  // 搜索
+  searchForm: {
+    search: '搜索',
+    reset: '重置',
+    expand: '展开',
+    close: '关闭'
   }
 }

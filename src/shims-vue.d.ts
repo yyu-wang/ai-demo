@@ -13,3 +13,10 @@ interface ImportMeta {
     // 可以根据你的实际需要添加其他属性
   }
 }
+
+declare namespace JSX {
+  interface IntrinsicElements {
+    // 这里添加你自己的组件名称和 props 类型
+    [elemName: string]: any
+  }
+}

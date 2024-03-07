@@ -9,35 +9,23 @@
     </div>
     <div class="right">
       <div class="lg flx-center">
-        <Lunguage />
+        <Language />
       </div>
       <Avatar />
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
-// import { useSystemStore } from '@/stores/modules/system'
+import Language from '@/layout/components/Language.vue'
+import Avatar from '@/layout/components/Avatar.vue'
+import { useGlobalStore } from '@/stores/modules/global'
+import { storeToRefs } from 'pinia'
+const globalStore = useGlobalStore()
+const { isCollapse } = storeToRefs(globalStore)
 
-import Lunguage from './headerCompopents/Lunguage.vue'
-import Avatar from './headerCompopents/Avatar.vue'
-
-// import { loginSystemStore } from '@/stores/login'
-// const userStore = useSystemStore()
-
-defineProps({
-  modelValue: {
-    type: Boolean,
-    default: false
-  }
-})
-const isCollapse = ref(false)
-// eslint-disable-next-line vue/valid-define-emits
-const emits = defineEmits()
 // 关闭menu的文字信息
 const isCollapseFn = () => {
-  isCollapse.value = !isCollapse.value
-  emits('update:modelValue', isCollapse.value)
+  globalStore.setGlobalState('isCollapse', !isCollapse.value)
 }
 </script>
 <style lang="scss" scoped>
@@ -73,3 +61,4 @@ const isCollapseFn = () => {
   }
 }
 </style>
+./headerCompopents/Language.vue

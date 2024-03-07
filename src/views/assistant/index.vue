@@ -20,7 +20,7 @@
   <div>
     <div class="top">
       <div class="top-title">
-        <!-- <img class="title-img" src="../../assets/images/edugpt_logo.png" alt="" /> -->
+        <!-- <img class="title-img" src="@/assets/images/edugpt_logo.png" alt="" /> -->
       </div>
       <div class="top-right">
         <div class="top-btn">
@@ -32,7 +32,7 @@
     </div>
     <!-- 应用列表 -->
     <div class="tableData-box">
-      <el-table :data="tableData" border style="width: 100%">
+      <el-table :data="tableData" border>
         <el-table-column align="center" prop="name" :label="t('assistant.tab.name')" width="180" />
         <el-table-column
           align="center"
@@ -56,7 +56,12 @@
         <el-table-column align="center" prop="createdTime" :label="t('assistant.tab.createdTime')">
           <template #default="scope">{{ formatTimestamp(scope.row.created_at) }}</template>
         </el-table-column>
-        <el-table-column align="center" :label="t('assistant.tab.operate')" width="100">
+        <el-table-column
+          align="center"
+          :label="t('assistant.tab.operate')"
+          width="100"
+          fixed="right"
+        >
           <template #default="scope">
             <div style="display: flex; justify-content: space-between">
               <el-tooltip effect="dark" :content="t('assistant.tab.delete')" placement="top-start">
@@ -145,8 +150,6 @@ const editFn = (row: any) => {
   createType.value = 'edit'
   isDialog.value = true
 }
-// 暂存跳转的地址，区别同页面进入补贴的chat页面
-const pathStr = ref('chat1')
 
 // 进入测试页面
 const toPlayground = (row: any) => {
@@ -154,7 +157,7 @@ const toPlayground = (row: any) => {
   let { id } = row
   // userStore.setMenuActive('/chat')
   router.push({
-    name: pathStr.value,
+    name: 'chat',
     query: {
       id
     }

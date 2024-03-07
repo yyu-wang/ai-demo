@@ -1,8 +1,8 @@
 import request from '../index'
-
+import { assistantRes, assistantReq } from '../interfaces/assistant'
 class appApi {
   // 创建助手
-  createAssistant(data: any) {
+  createAssistant(data: any): Promise<assistantRes.createType> {
     return request({
       url: '/api/v1/chat/assistant/create',
       data,
@@ -26,7 +26,7 @@ class appApi {
     })
   }
   // 删除助手
-  deleteAssistant(data: any) {
+  deleteAssistant(data: assistantReq.deleteType) {
     return request({
       url: '/api/v1/chat/assistant/delete',
       data,

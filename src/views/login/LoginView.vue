@@ -1,8 +1,8 @@
 <template>
   <div class="login-container flx-center">
     <div class="login-box">
-      <img class="logo" src="../../assets/images/edugpt_logo.png" alt="" />
-      <div class="lg"><Lunguage /></div>
+      <img class="logo" src="@/assets/images/edugpt_logo.png" alt="" />
+      <div class="lg"><Language /></div>
       <div class="login-form">
         <div class="logo-text">{{ $t('login.title') }}</div>
         <LoginForm />
@@ -12,7 +12,7 @@
 </template>
 <script setup lang="ts" name="login">
 import LoginForm from './components/LoginForm.vue'
-import Lunguage from '@/layout/components/headerCompopents/Lunguage.vue'
+import Language from '@/layout/components/Language.vue'
 </script>
 
 <style scoped lang="scss">
@@ -65,3 +65,4 @@ import Lunguage from '@/layout/components/headerCompopents/Lunguage.vue'
   }
 }
 </style>
+@/layout/components/headerCompopents/Language.vue
