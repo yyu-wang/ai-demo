@@ -72,7 +72,7 @@ const routerList = ref<any[]>()
 const getRouter = () => {
   const arr = route.matched
   for (let i = 0; i < arr.length; i++) {
-    if (arr[i].name === 'layout') {
+    if (arr[i].name === 'adminLayout') {
       routerList.value = arr[i].children
       setSelect(route.path)
     }
